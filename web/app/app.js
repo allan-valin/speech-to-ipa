@@ -93,6 +93,18 @@ async function renderModels() {
     const state = !m.ready ? "em breve" : (await engine.isCached(m)) ? "baixado" : `${m.mb} MB a baixar`;
     row.innerHTML = `<input type="checkbox" ${m.ready ? "" : "disabled"} ${m.ready && chosen.includes(m.id) ? "checked" : ""}>
       <span class="name">${m.name}</span><span class="state">${state}</span>`;
+    if (state === "baixado") {
+      const drop = document.createElement("button");
+      drop.textContent = "apagar"; drop.className = "small";
+      drop.title = `Apagar ${m.name} do navegador (libera ${m.mb} MB; será baixado de novo quando precisar)`;
+      drop.onclick = async e => {
+        e.preventDefault();
+        await engine.forget(m);
+        log(`${m.name} apagado do navegador (${m.mb} MB liberados).`);
+        renderModels();
+      };
+      row.append(drop);
+    }
     row.querySelector("input").onchange = e => {
       const now = new Set(pref("models", ORDER));
       e.target.checked ? now.add(m.id) : now.delete(m.id);
