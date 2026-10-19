@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fala para IPA</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <header>
+    <h1>Fala → IPA</h1>
+    <p class="muted">Transcrição fonética estreita do que foi dito, não do que o dicionário diz.
+      Tudo roda no seu aparelho; o áudio não sai daqui.</p>
+  </header>
+
+  <p class="notice" id="first-load">Os modelos são grandes (70 a 580 MB cada). O primeiro download demora;
+    depois eles ficam guardados no navegador. Se você limpar os dados do navegador, eles serão baixados de novo.</p>
+
+  <section class="card" id="mic-card">
+    <h2>Microfone</h2>
+    <div class="row">
+      <button id="mic">Permitir microfone</button>
+      <span id="mic-state" class="muted">Ainda não autorizado.</span>
+    </div>
+    <p class="help" id="mic-help" hidden>O navegador bloqueou o microfone. Para liberar: toque no ícone ao lado do
+      endereço do site → Permissões (ou Configurações do site) → Microfone → Permitir. No iPhone:
+      Ajustes → Safari → Microfone. Depois recarregue a página.</p>
+  </section>
+
+  <section class="card">
+    <h2>Modelos</h2>
+    <div id="models"></div>
+    <p class="muted" id="total"></p>
+    <p class="warn" id="heavy" hidden>Muitos modelos juntos podem travar o navegador em aparelhos mais fracos.
+      Rodar um de cada vez é mais seguro.</p>
+    <fieldset class="row">
+      <legend>Como rodar</legend>
+      <label><input type="radio" name="mode" value="seq" checked> Um de cada vez (recomendado)</label>
+      <label><input type="radio" name="mode" value="all"> Todos ao mesmo tempo</label>
+    </fieldset>
+    <details>
+      <summary>Avançado</summary>
+      <label class="row">Processamento
+        <select id="backend"><option value="wasm">CPU (WASM)</option><option value="webgpu">GPU (WebGPU)</option></select>
+      </label>
+    </details>
+  </section>
+
+  <section class="card">
+    <h2>Gravar</h2>
+    <div class="row">
+      <button id="rec" disabled>Gravar</button>
+      <label class="button">Escolher arquivo de áudio<input id="file" type="file" accept="audio/*" hidden></label>
+    </div>
+  </section>
+
+  <section class="card" id="result" hidden>
+    <h2 id="result-title">Resultado</h2>
+    <div class="row" id="views" role="tablist"></div>
+    <div id="ipa" class="ipa"></div>
+    <p class="muted" id="ipa-hint"></p>
+    <div id="alts" class="alts" hidden></div>
+    <div class="row">
+      <button id="rerun">Rodar os modelos marcados nesta gravação</button>
+      <button id="play-all">Ouvir gravação</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Gravações</h2>
+    <div id="recordings"><p class="muted">Nenhuma gravação ainda.</p></div>
+  </section>
+
+  <div id="busy" class="busy"><div></div></div>
+  <section class="card">
+    <h2>Registro</h2>
+    <div id="log" class="log"></div>
+  </section>
+
+  <footer class="muted" id="credits"></footer>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.30.0/dist/ort.all.min.js"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>

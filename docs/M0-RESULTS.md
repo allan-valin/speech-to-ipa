@@ -78,6 +78,29 @@ Ideas to test next: fp16 model on WebGPU (int8 MatMulInteger likely runs slow or
 emulated), fp32 on WASM (2.3 GB, too big for phones), coi-serviceworker so GitHub
 Pages gets cross-origin isolation.
 
+## Browser app vs Python (95 clips, one per language)
+
+The M1 app's engine (`web/app/engine.js`) in headless Chromium, int8 models loaded
+from Hugging Face, vs Python onnxruntime on the same int8 files:
+
+| Model | Browser PER / PFER | Python int8 PER / PFER |
+|---|---|---|
+| PhoneticXeus | 41.4 / 11.5 | 41.3 / 11.0 |
+| MultIPA | 52.2 / 11.2 | 52.1 / 11.2 |
+| ZIPA | 48.4 / 14.3 | 54.7 / 14.5 |
+
+Speed per ~1 s clip (WASM, laptop): PhoneticXeus 3.0 s, MultIPA 1.8 s, ZIPA 0.07 s.
+
+- The browser must decode audio in a 16 kHz context: decoding at the default 48 kHz
+  and resampling back changed MultIPA's output (`ʃøyjd` → `ʃeyd`).
+- **ZIPA's gap is a scoring artefact in the harness, not the browser.** ZIPA emits
+  diacritics and length as separate tokens (`t ̪`, `a ː`); the harness keeps the
+  spaces, so `evaluate.py` scores each mark as an extra phone. Joining them: ZIPA
+  narrow PER 62.1 → **59.1** on the 760 subset (PFER and broad unchanged). The
+  paper's ZIPA rows (64.2 small / 69.1 large) are likely ~3 points too high for the
+  same reason — to check in phonetic-eval. The app attaches such tokens to the
+  previous phone (`web/app/ctc.js`).
+
 ## Still open in M0
 
 - ONNX export of POWSM (encoder-decoder + beam search), WhIPA (Whisper — optimum

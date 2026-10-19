@@ -17,7 +17,16 @@ export function greedyCtc(logits, frames, vocabSize, id2sym, blank) {
     prev = id;
     const sym = id2sym[id] || "";
     if (id === blank || !sym.trim() || /^[<[].*[>\]]$/.test(sym) || sym === "▁" || sym === "|") continue;
+    const last = out[out.length - 1];
+    if (last && MODIFIER.test(sym)) {           // a bare diacritic/length token joins the phone before
+      last.sym += sym; last.end = t + 1; last.id = id;
+      continue;
+    }
     out.push({ id, sym, start: t, end: t + 1 });
   }
   return out.map(({ sym, start, end }) => ({ sym, start, end }));
 }
+
+// Tokens made only of combining marks (Mn) or modifier letters/symbols (Lm, Sk):
+// ̪ ̃ ː ʰ ʲ ʷ ˤ tone letters… They describe the phone before them.
+const MODIFIER = /^[\p{Mn}\p{Lm}\p{Sk}]+$/u;

@@ -16,6 +16,17 @@ test("greedy CTC merges repeats, drops blank and specials, keeps frame spans", (
   ]);
 });
 
+test("diacritic and length tokens attach to the phone before them (ZIPA emits them apart)", () => {
+  const ids = [1, 2, 0, 3, 4];
+  const V = 5, logits = new Float32Array(ids.length * V);
+  ids.forEach((id, t) => { logits[t * V + id] = 1; });
+  const out = greedyCtc(logits, ids.length, V, ["<blk>", "t", "̪", "a", "ː"], 0);
+  assert.deepEqual(out, [
+    { sym: "t̪", start: 0, end: 2 },
+    { sym: "aː", start: 3, end: 5 },
+  ]);
+});
+
 const run = (hyps, models, backbone = models[0]) => vote(align(hyps, models), models, backbone);
 
 test("all agree", () => {
