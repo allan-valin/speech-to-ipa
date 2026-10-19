@@ -155,4 +155,10 @@ export default {
   "src.data": "Daten und Werkzeuge",
   "src.nc": "Nicht kommerzielle Nutzung: Zwei der Modelle stehen unter CC BY-NC-SA 4.0.",
   "src.code": "Quellcode",
+  "instr.6": "Sprich in normalem Tempo, nicht zu schnell; Aufnahmen über 1 Sekunde funktionieren besser.",
+  "run.reading": "Lade {name} vom Gerät ({step})…",
+  "theme.toLight": "Zum hellen Design wechseln",
+  "theme.toDark": "Zum dunklen Design wechseln",
+  "theme.light": "Helles Design.",
+  "theme.dark": "Dunkles Design.",
 };

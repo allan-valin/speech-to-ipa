@@ -156,4 +156,10 @@ export default {
   "src.data": "Data and tools",
   "src.nc": "Non-commercial use: two of the models are CC BY-NC-SA 4.0.",
   "src.code": "Source code",
+  "instr.6": "Speak at a normal pace, not too fast; recordings longer than 1 second work better.",
+  "run.reading": "Reading {name} from the device ({step})…",
+  "theme.toLight": "Switch to light theme",
+  "theme.toDark": "Switch to dark theme",
+  "theme.light": "Light theme.",
+  "theme.dark": "Dark theme.",
 };

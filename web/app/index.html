@@ -16,22 +16,26 @@
       <p class="muted" data-i18n="tagline">Transcrição fonética estreita do que foi dito, não do que o dicionário diz.
         Tudo roda no seu aparelho; o áudio não sai daqui.</p>
     </div>
-    <button id="menu-btn" class="icon" aria-haspopup="dialog" data-i18n-title="menu" title="Menu">
+    <div class="top-buttons">
+    <button id="theme-btn" class="icon framed" aria-label="☾ / ☀">☾</button>
+    <button id="menu-btn" class="icon framed" aria-haspopup="dialog" data-i18n-title="menu" title="Menu">
       <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
     </button>
+    </div>
   </header>
   <nav class="langs" id="langs" aria-label="Idioma"></nav>
 
-  <section class="notice" id="instructions">
-    <h2 data-i18n="instr.title">Instruções</h2>
+  <details class="notice" id="instructions" open>
+    <summary><h2 data-i18n="instr.title">Instruções</h2></summary>
     <ol>
       <li data-i18n-html="instr.1">Toque em <b>▶</b> para gravar e em <b>■</b> para parar.</li>
       <li data-i18n-html="instr.2">Na primeira vez, o app pergunta se pode baixar os modelos (cerca de 1,3 GB com os cinco recomendados). Isso só demora na primeira vez.</li>
       <li data-i18n-html="instr.3">O navegador vai pedir o <b>microfone</b> e pode perguntar se o site pode <b>guardar dados permanentemente</b>: aceite os dois. Os dados são os modelos, não as gravações; sem isso, o navegador pode apagá-los e eles serão baixados de novo.</li>
       <li data-i18n-html="instr.4">No resultado, <b>toque nos símbolos</b> para ouvir cada som.</li>
+      <li data-i18n-html="instr.6">Fale em ritmo normal, sem pressa; gravações de mais de 1 segundo funcionam melhor.</li>
       <li data-i18n-html="instr.5">Escolher modelos, fontes e ajuda: botão <b>☰</b> no alto.</li>
     </ol>
-  </section>
+  </details>
 
   <section class="card">
     <h2 data-i18n="rec.title">Gravar</h2>

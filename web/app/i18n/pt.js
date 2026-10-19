@@ -156,4 +156,10 @@ export default {
   "src.data": "Dados e ferramentas",
   "src.nc": "Uso não comercial: dois dos modelos são CC BY-NC-SA 4.0.",
   "src.code": "Código-fonte",
+  "instr.6": "Fale em ritmo normal, sem pressa; gravações de mais de 1 segundo funcionam melhor.",
+  "run.reading": "Lendo {name} do aparelho ({step})…",
+  "theme.toLight": "Mudar para tema claro",
+  "theme.toDark": "Mudar para tema escuro",
+  "theme.light": "Tema claro.",
+  "theme.dark": "Tema escuro.",
 };

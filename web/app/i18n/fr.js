@@ -155,4 +155,10 @@ export default {
   "src.data": "Données et outils",
   "src.nc": "Usage non commercial : deux des modèles sont sous CC BY-NC-SA 4.0.",
   "src.code": "Code source",
+  "instr.6": "Parlez à un rythme normal, sans vous presser ; les enregistrements de plus d'une seconde marchent mieux.",
+  "run.reading": "Lecture de {name} depuis l'appareil ({step})…",
+  "theme.toLight": "Passer au thème clair",
+  "theme.toDark": "Passer au thème sombre",
+  "theme.light": "Thème clair.",
+  "theme.dark": "Thème sombre.",
 };

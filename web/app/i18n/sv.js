@@ -156,4 +156,10 @@ export default {
   "src.data": "Data och verktyg",
   "src.nc": "Icke-kommersiell användning: två av modellerna är CC BY-NC-SA 4.0.",
   "src.code": "Källkod",
+  "instr.6": "Tala i normal takt, inte för snabbt; inspelningar längre än 1 sekund fungerar bättre.",
+  "run.reading": "Läser {name} från enheten ({step})…",
+  "theme.toLight": "Byt till ljust tema",
+  "theme.toDark": "Byt till mörkt tema",
+  "theme.light": "Ljust tema.",
+  "theme.dark": "Mörkt tema.",
 };

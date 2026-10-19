@@ -36,6 +36,22 @@ function pref(key, fallback) { try { return JSON.parse(localStorage.getItem(key)
 function setPref(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* private mode */ } }
 const RECOMMENDED = MODELS.filter(m => m.recommended).map(m => m.id);
 
+// ---------- light / dark ----------
+function applyTheme() {
+  const th = pref("theme", null);                  // null: follow the system
+  if (th) document.documentElement.dataset.theme = th; else delete document.documentElement.dataset.theme;
+  const dark = th ? th === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  $("theme-btn").textContent = dark ? "☀" : "☾";
+  $("theme-btn").title = t(dark ? "theme.toLight" : "theme.toDark");
+  return dark;
+}
+function toggleTheme() {
+  const dark = document.documentElement.dataset.theme
+    ? document.documentElement.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  setPref("theme", dark ? "light" : "dark");
+  say(t(applyTheme() ? "theme.dark" : "theme.light"));
+}
+
 // ---------- language ----------
 function renderLangs() {
   for (const box of [$("langs"), $("langs-menu")]) {
@@ -52,6 +68,7 @@ function renderLangs() {
 }
 function refreshTexts() {
   applyStatic(document);
+  applyTheme();
   renderLangs(); renderModels(); renderRecordings(); render(); renderMenuText(); checkMicPermission();
 }
 function renderMenuText() {
@@ -239,11 +256,13 @@ async function runModels(models, fresh = false) {
       const step = `${i + 1}/${todo.length}`;
       progress(t("run.loading", { name: m.name, step }), i / todo.length);
       const t0 = performance.now();
-      const loaded = kept[m.id] || await engine.load(m, backend, f =>
-        progress(t("run.downloading", { name: m.name, step, got: Math.round(f * m.mb), size: m.mb }), (i + f * 0.9) / todo.length));
+      const loaded = kept[m.id] || await engine.load(m, backend, (f, fromCache) => progress(fromCache
+        ? t("run.reading", { name: m.name, step })
+        : t("run.downloading", { name: m.name, step, got: Math.round(f * m.mb), size: m.mb }), (i + f * 0.9) / todo.length));
       log(t("run.loaded", { name: m.name, s: secs((performance.now() - t0) / 1000), how: t(loaded.fromCache ? "run.fromCache" : "run.downloaded") })
         + (loaded.stored === false ? " " + t("run.notStored") : ""));
       progress(t("run.transcribing", { name: m.name, step }), (i + 0.9) / todo.length);
+      await new Promise(r => setTimeout(r, 30));      // let the label paint before the model blocks the page
       const t1 = performance.now();
       rec.results[m.id] = await engine.transcribe(m, loaded, rec.wav);
       const got = rec.results[m.id].map(p => p.sym).join("");
@@ -591,6 +610,9 @@ async function renderRecordings() {
 
 // ---------- wiring ----------
 $("menu-btn").onclick = () => openMenu("options");
+$("theme-btn").onclick = toggleTheme;
+$("instructions").open = pref("instructionsOpen", true);
+$("instructions").ontoggle = () => setPref("instructionsOpen", $("instructions").open);
 for (const b of document.querySelectorAll("[data-tab]")) b.onclick = () => openMenu(b.dataset.tab);
 for (const b of document.querySelectorAll("[data-close]")) b.onclick = () => { b.closest(".overlay").hidden = true; log(t("closed")); };
 for (const o of [$("overlay"), $("picker")]) o.addEventListener("click", e => { if (e.target === o) o.hidden = true; });

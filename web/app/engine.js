@@ -12,10 +12,10 @@ async function cached(url) {
   try { return await (await caches.open(CACHE)).match(url); } catch { return null; }
 }
 
-/** Download `url` (or read it from the cache), reporting progress 0..1. */
+/** Download `url` (or read it from the cache), reporting progress 0..1 (second argument true: from the cache). */
 async function fetchBytes(url, onProgress) {
   const hit = await cached(url);
-  if (hit) { onProgress?.(1); return { bytes: new Uint8Array(await hit.arrayBuffer()), fromCache: true }; }
+  if (hit) { onProgress?.(1, true); return { bytes: new Uint8Array(await hit.arrayBuffer()), fromCache: true }; }
   const res = await fetch(url);
   if (!res.ok) throw new Error(`download falhou (${res.status})`);
   const total = +res.headers.get("content-length") || 0, reader = res.body.getReader(), parts = [];

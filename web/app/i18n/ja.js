@@ -155,4 +155,10 @@ export default {
   "src.data": "データとツール",
   "src.nc": "非商用利用のみ：2つのモデルは CC BY-NC-SA 4.0 です。",
   "src.code": "ソースコード",
+  "instr.6": "普通の速さで話してください（速すぎないように）。1秒より長い録音のほうがうまくいきます。",
+  "run.reading": "{name} を端末から読み込み中（{step}）…",
+  "theme.toLight": "ライトテーマに切り替え",
+  "theme.toDark": "ダークテーマに切り替え",
+  "theme.light": "ライトテーマ。",
+  "theme.dark": "ダークテーマ。",
 };
