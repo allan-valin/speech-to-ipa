@@ -2,6 +2,7 @@ import { MODELS, ORDER } from "./models.js";
 import * as engine from "./engine.js";
 import * as store from "./store.js";
 import { align, vote } from "./vote.js";
+import { bundle, zip } from "./export.js";
 
 const $ = id => document.getElementById(id);
 const byId = Object.fromEntries(MODELS.map(m => [m.id, m]));
@@ -230,6 +231,42 @@ function play(start = 0, end = null) {
   log(end === null ? "Tocando a gravação." : `Tocando ${start.toFixed(2)}–${end.toFixed(2)} s.`);
 }
 
+// ---------- export ----------
+function exportFile() {
+  const ran = ranModels(current);
+  const files = bundle(current, ran);
+  const name = files[0].name.replace(/\.wav$/, ".zip");
+  return new File([zip(files, new Date(current.created))], name, { type: "application/zip" });
+}
+
+async function saveExport() {
+  if (!current || !ranModels(current).length) { log("Nada para exportar: rode pelo menos um modelo."); return; }
+  const file = exportFile();
+  if (window.showSaveFilePicker) {
+    try {
+      const handle = await showSaveFilePicker({ suggestedName: file.name, types: [{ description: "Zip", accept: { "application/zip": [".zip"] } }] });
+      const w = await handle.createWritable();
+      await w.write(file); await w.close();
+      log(`Exportado: ${handle.name}.`);
+      return;
+    } catch (e) {
+      if (e.name === "AbortError") { log("Exportação cancelada."); return; }
+      log(`Janela "salvar como" indisponível (${e.message}); baixando o arquivo.`);
+    }
+  }
+  const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(file), download: file.name });
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+  log(`Baixando ${file.name}. O navegador pode perguntar onde salvar.`);
+}
+
+async function shareExport() {
+  if (!current || !ranModels(current).length) { log("Nada para compartilhar: rode pelo menos um modelo."); return; }
+  const file = exportFile();
+  try { await navigator.share({ files: [file], title: file.name }); log("Compartilhado."); }
+  catch (e) { log(e.name === "AbortError" ? "Compartilhamento cancelado." : `Não deu para compartilhar (${e.message}).`); }
+}
+
 // ---------- recordings list ----------
 async function renderRecordings() {
   let recs = [];
@@ -272,6 +309,9 @@ $("file").onchange = async e => {
 };
 $("rerun").onclick = () => { log("Rodando os modelos marcados que faltam nesta gravação…"); runModels(); };
 $("play-all").onclick = () => play();
+$("export").onclick = saveExport;
+$("share").onclick = shareExport;
+try { $("share").hidden = !navigator.canShare?.({ files: [new File(["x"], "x.zip", { type: "application/zip" })] }); } catch { /* no Web Share */ }
 $("backend").value = pref("backend", "wasm");
 $("backend").onchange = e => { setPref("backend", e.target.value); log(`Processamento: ${e.target.selectedOptions[0].text}.`); };
 for (const r of document.querySelectorAll("input[name=mode]")) {
