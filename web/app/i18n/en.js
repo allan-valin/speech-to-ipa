@@ -162,4 +162,6 @@ export default {
   "theme.toDark": "Switch to dark theme",
   "theme.light": "Light theme.",
   "theme.dark": "Dark theme.",
+  "res.wrap": "Allow line breaks",
+  "res.scroll": "Scroll the transcription sideways",
 };

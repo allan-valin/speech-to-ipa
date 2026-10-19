@@ -161,4 +161,6 @@ export default {
   "theme.toDark": "Zum dunklen Design wechseln",
   "theme.light": "Helles Design.",
   "theme.dark": "Dunkles Design.",
+  "res.wrap": "Zeilenumbruch erlauben",
+  "res.scroll": "Transkription seitlich scrollen",
 };

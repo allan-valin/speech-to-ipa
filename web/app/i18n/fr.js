@@ -161,4 +161,6 @@ export default {
   "theme.toDark": "Passer au thème sombre",
   "theme.light": "Thème clair.",
   "theme.dark": "Thème sombre.",
+  "res.wrap": "Autoriser les retours à la ligne",
+  "res.scroll": "Faire défiler la transcription horizontalement",
 };

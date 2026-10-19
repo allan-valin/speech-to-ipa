@@ -162,4 +162,6 @@ export default {
   "theme.toDark": "Mudar para tema escuro",
   "theme.light": "Tema claro.",
   "theme.dark": "Tema escuro.",
+  "res.wrap": "Permitir quebra de linha",
+  "res.scroll": "Rolar a transcrição para os lados",
 };

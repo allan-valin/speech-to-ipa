@@ -58,7 +58,7 @@ function renderLangs() {
     box.innerHTML = "";
     for (const l of LANGS) {
       const b = document.createElement("button");
-      b.className = "flag" + (l.code === lang() ? " on" : "");
+      b.className = "langflag" + (l.code === lang() ? " on" : "");
       b.title = l.name; b.setAttribute("aria-label", l.name);
       b.innerHTML = `<img src="flags/${l.flag}.svg" alt=""><span>${l.short}</span>`;
       b.onclick = () => { setLang(l.code); setPref("lang", l.code); refreshTexts(); say(t("lang.set", { name: l.name })); };
@@ -303,35 +303,57 @@ function render() {
   }
   const cols = grid(Object.fromEntries(ran.map(id => [id, current.results[id]])), ran);
   const aligned = $("opt-align").checked;
-  const table = document.createElement("div");
-  table.className = "rows" + (aligned ? " aligned" : "");
-  if (aligned) table.style.gridTemplateColumns = `max-content repeat(${cols.length}, max-content)`;
-  const addRow = (label, cells, cls = "") => {
-    const who = document.createElement("div");
-    who.className = "who " + cls; who.textContent = label;
-    table.append(who);
-    if (aligned) cells.forEach(c => table.append(c));
-    else {
-      const line = document.createElement("div"); line.className = "line";
-      const kept = cells.filter(c => !c.classList.contains("gap"));
-      if (kept.length) kept.forEach(c => line.append(c));
-      else line.innerHTML = `<span class="muted">${t("res.nothing")}</span>`;
-      table.append(line);
-    }
+  const rows = [...ran.map(id => ({ label: byId[id].name, cells: cols.map((col, k) => {
+    const p = col.cells[id];
+    return p ? cell(p.sym, k, cols, !col.cons.agreed) : gap(k);
+  }) })), { label: t("res.consensus"), cons: true,
+    cells: cols.map((col, k) => (col.cons.sym ? cell(col.cons.sym, k, cols, !col.cons.agreed, "cons") : gap(k))) }];
+  const slot = (child, isCons) => {
+    const d = document.createElement("div");
+    d.className = "slot" + (isCons ? " cons" : "");
+    if (typeof child === "string") { d.textContent = child; d.classList.add("who"); } else d.append(child);
+    return d;
   };
-  for (const id of ran) {
-    addRow(byId[id].name, cols.map((col, k) => {
-      const p = col.cells[id];
-      return p ? cell(p.sym, k, cols, !col.cons.agreed) : gap(k, cols);
-    }));
+  const table = document.createElement("div");
+  if (aligned) {
+    // one column per aligned slot, every model stacked inside it: the same sound stays in one column
+    table.className = "cols";
+    const labels = document.createElement("div"); labels.className = "col labels";
+    rows.forEach(r => labels.append(slot(r.label, r.cons)));
+    table.append(labels);
+    cols.forEach((_, k) => {
+      const c = document.createElement("div"); c.className = "col";
+      rows.forEach(r => c.append(slot(r.cells[k], r.cons)));
+      table.append(c);
+    });
+  } else {
+    table.className = "lines";
+    for (const r of rows) {
+      const line = document.createElement("div"); line.className = "line" + (r.cons ? " cons" : "");
+      line.append(slot(r.label, false));
+      const kept = r.cells.filter(c => !c.classList.contains("gap"));
+      const seq = document.createElement("div"); seq.className = "seq";
+      if (kept.length) kept.forEach(c => seq.append(c));
+      else seq.innerHTML = `<span class="muted">${t("res.nothing")}</span>`;
+      line.append(seq); table.append(line);
+    }
   }
-  addRow(t("res.consensus"), cols.map((col, k) => (col.cons.sym ? cell(col.cons.sym, k, cols, !col.cons.agreed, "cons") : gap(k, cols))), "cons");
+  table.classList.toggle("wrap", $("opt-wrap").checked);
   box.append(table);
+  requestAnimationFrame(syncScroll);
   const cons = cols.filter(c => c.cons.sym), flagged = cons.filter(c => !c.cons.agreed).length;
   const empty = ran.filter(id => !current.results[id].length).map(id => byId[id].name);
   $("ipa-hint").textContent = (ran.length < 3 ? t("res.few") : t("res.flagged", { n: flagged, of: cons.length }))
     + (empty.length ? " " + t("res.empty", { names: empty.join(", ") }) : "");
   renderEdited();
+}
+
+// a big slider under the result stands in for the scroll bar (phones hide theirs)
+function syncScroll() {
+  const g = $("grid"), bar = $("grid-scroll"), over = g.scrollWidth - g.clientWidth;
+  bar.hidden = over <= 2;
+  bar.max = Math.max(over, 0);
+  bar.value = g.scrollLeft;
 }
 
 /** Time span of a column: from the consensus, else from any model that marks time. */
@@ -647,7 +669,10 @@ $("ed-del").onclick = () => { if (!needSel()) return; draft = removeAt(draft, se
 $("ed-save").onclick = () => saveEdit(draft);
 $("ed-cancel").onclick = () => { $("editor").hidden = true; draft = null; say(t("ed.cancelled")); };
 $("ed-reset").onclick = () => saveEdit(null);
-for (const [id, key, fallback] of [["opt-wide", "wide", true], ["opt-align", "align", true]]) {
+$("grid").addEventListener("scroll", () => { $("grid-scroll").value = $("grid").scrollLeft; });
+$("grid-scroll").oninput = e => { $("grid").scrollLeft = +e.target.value; };
+new ResizeObserver(syncScroll).observe($("grid"));
+for (const [id, key, fallback] of [["opt-wide", "wide", true], ["opt-align", "align", true], ["opt-wrap", "wrap", false]]) {
   $(id).checked = pref(key, fallback);
   $(id).onchange = e => { setPref(key, e.target.checked); render(); say(t(e.target.checked ? "opt.onMsg" : "opt.offMsg", { what: e.target.nextElementSibling.textContent })); };
 }

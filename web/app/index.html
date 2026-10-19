@@ -57,8 +57,10 @@
     <div class="row checks">
       <label><input type="checkbox" id="opt-wide"> <span data-i18n="res.wide">Mesma largura para todos os símbolos</span></label>
       <label><input type="checkbox" id="opt-align"> <span data-i18n="res.align">Alinhar em colunas</span></label>
+      <label><input type="checkbox" id="opt-wrap"> <span data-i18n="res.wrap">Permitir quebra de linha</span></label>
     </div>
     <div id="grid" class="grid"></div>
+    <input type="range" id="grid-scroll" class="grid-scroll" min="0" value="0" hidden data-i18n-title="res.scroll" title="Rolar">
     <p class="muted" id="ipa-hint"></p>
     <div id="alts" class="alts" hidden></div>
     <div id="edited-line" class="edited-line" hidden></div>

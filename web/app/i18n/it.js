@@ -162,4 +162,6 @@ export default {
   "theme.toDark": "Passa al tema scuro",
   "theme.light": "Tema chiaro.",
   "theme.dark": "Tema scuro.",
+  "res.wrap": "Consenti di andare a capo",
+  "res.scroll": "Scorri la trascrizione in orizzontale",
 };

@@ -161,4 +161,6 @@ export default {
   "theme.toDark": "ダークテーマに切り替え",
   "theme.light": "ライトテーマ。",
   "theme.dark": "ダークテーマ。",
+  "res.wrap": "改行を許可",
+  "res.scroll": "書き起こしを横にスクロール",
 };

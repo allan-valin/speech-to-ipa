@@ -162,4 +162,6 @@ export default {
   "theme.toDark": "Byt till mörkt tema",
   "theme.light": "Ljust tema.",
   "theme.dark": "Mörkt tema.",
+  "res.wrap": "Tillåt radbrytning",
+  "res.scroll": "Rulla transkriptionen i sidled",
 };
