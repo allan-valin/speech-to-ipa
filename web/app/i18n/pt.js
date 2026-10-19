@@ -164,4 +164,6 @@ export default {
   "theme.dark": "Tema escuro.",
   "res.wrap": "Permitir quebra de linha",
   "res.scroll": "Rolar a transcrição para os lados",
+  "recs.exportAll": "Exportar todas (.zip)",
+  "exp.packing": "Juntando {n} gravação(ões) num .zip, cada uma na sua pasta…",
 };

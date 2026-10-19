@@ -163,4 +163,6 @@ export default {
   "theme.dark": "ダークテーマ。",
   "res.wrap": "改行を許可",
   "res.scroll": "書き起こしを横にスクロール",
+  "recs.exportAll": "すべて書き出し（.zip）",
+  "exp.packing": "{n} 件の録音を 1 つの .zip にまとめています（録音ごとにフォルダ）…",
 };

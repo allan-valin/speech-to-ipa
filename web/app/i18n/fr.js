@@ -163,4 +163,6 @@ export default {
   "theme.dark": "Thème sombre.",
   "res.wrap": "Autoriser les retours à la ligne",
   "res.scroll": "Faire défiler la transcription horizontalement",
+  "recs.exportAll": "Tout exporter (.zip)",
+  "exp.packing": "Regroupement de {n} enregistrement(s) dans un .zip, chacun dans son dossier…",
 };

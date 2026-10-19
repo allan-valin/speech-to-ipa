@@ -164,4 +164,6 @@ export default {
   "theme.dark": "Dark theme.",
   "res.wrap": "Allow line breaks",
   "res.scroll": "Scroll the transcription sideways",
+  "recs.exportAll": "Export all (.zip)",
+  "exp.packing": "Packing {n} recording(s) into one .zip, each in its own folder…",
 };

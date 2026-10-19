@@ -1,6 +1,6 @@
 // Export bundle: the recording (WAV), every model's IPA + the consensus (TXT),
 // timings/votes/alternatives (JSON) and a Praat TextGrid, packed in a plain zip.
-import { MODELS } from "./models.js";
+import { MODELS, ORDER } from "./models.js";
 import { grid } from "./vote.js";
 
 const NAMES = Object.fromEntries(MODELS.map(m => [m.id, m.name]));
@@ -36,16 +36,22 @@ export function zip(files, when = new Date()) {
   let offset = 0;
   for (const f of files) {
     const name = enc.encode(f.name), crc = crc32(f.data);
-    const local = new Uint8Array(30 + name.length), lv = new DataView(local.buffer);
+    // Info-ZIP Unicode Path field (0x7075): some unzip builds ignore the UTF-8 flag but read this
+    const extra = new Uint8Array(9 + name.length), xv = new DataView(extra.buffer);
+    xv.setUint16(0, 0x7075, true); xv.setUint16(2, 5 + name.length, true); xv.setUint8(4, 1);
+    xv.setUint32(5, crc32(name), true); extra.set(name, 9);
+    const local = new Uint8Array(30 + name.length + extra.length), lv = new DataView(local.buffer);
     lv.setUint32(0, 0x04034b50, true); lv.setUint16(4, 20, true); lv.setUint16(6, 0x0800, true); // UTF-8 names
     lv.setUint16(10, dosTime, true); lv.setUint16(12, dosDate, true);
     lv.setUint32(14, crc, true); lv.setUint32(18, f.data.length, true); lv.setUint32(22, f.data.length, true);
-    lv.setUint16(26, name.length, true); local.set(name, 30);
-    const cen = new Uint8Array(46 + name.length), cv = new DataView(cen.buffer);
+    lv.setUint16(26, name.length, true); lv.setUint16(28, extra.length, true);
+    local.set(name, 30); local.set(extra, 30 + name.length);
+    const cen = new Uint8Array(46 + name.length + extra.length), cv = new DataView(cen.buffer);
     cv.setUint32(0, 0x02014b50, true); cv.setUint16(4, 20, true); cv.setUint16(6, 20, true); cv.setUint16(8, 0x0800, true);
     cv.setUint16(12, dosTime, true); cv.setUint16(14, dosDate, true);
     cv.setUint32(16, crc, true); cv.setUint32(20, f.data.length, true); cv.setUint32(24, f.data.length, true);
-    cv.setUint16(28, name.length, true); cv.setUint32(42, offset, true); cen.set(name, 46);
+    cv.setUint16(28, name.length, true); cv.setUint16(30, extra.length, true); cv.setUint32(42, offset, true);
+    cen.set(name, 46); cen.set(extra, 46 + name.length);
     parts.push(local, f.data); central.push(cen);
     offset += local.length + f.data.length;
   }
@@ -81,6 +87,27 @@ export function textGrid(rec, ran, cons) {
     + tiers.map(([n, p], i) => `    item [${i + 1}]:\n${tier(n, p)}`).join("");
 }
 
+const two = n => String(n).padStart(2, "0");
+const stamp = d => `${d.getFullYear()}-${two(d.getMonth() + 1)}-${two(d.getDate())}_${two(d.getHours())}-${two(d.getMinutes())}-${two(d.getSeconds())}`;
+
+/**
+ * File name: the date first (local time, like the list shows), then what it is, how long,
+ * and the transcription (the edit if there is one). Characters that file systems
+ * refuse become "-".
+ */
+export function baseName(rec, cons) {
+  const ipa = (rec.edited || cons.map(c => c.sym)).join("").normalize("NFC")
+    .replace(/[\\/:*?"<>|‖\s]+/g, "-").replace(/^[-.]+|[-.]+$/g, "");
+  const secs = `${(rec.wav.length / 16000).toFixed(1)}s`;
+  return [stamp(new Date(rec.created)), "ipa", secs, [...ipa].slice(0, 40).join("")].filter(Boolean).join("_");
+}
+
+/** Every recording in one zip, each in its own folder. Returns { name, data }. */
+export function zipAll(recs, when = new Date()) {
+  const files = recs.flatMap(rec => bundle(rec, ORDER.filter(id => rec.results[id])));
+  return { name: `${stamp(when)}_ipa_${recs.length}-recordings.zip`, data: zip(files, when) };
+}
+
 /** The consensus as shown on screen: columns aligned by time, empty decisions dropped. */
 export function consensus(rec, ran) {
   return grid(Object.fromEntries(ran.map(id => [id, rec.results[id]])), ran).map(c => c.cons).filter(c => c.sym);
@@ -89,9 +116,7 @@ export function consensus(rec, ran) {
 /** Files for one recording. `ran` = model ids in vote order that have results. */
 export function bundle(rec, ran) {
   const cons = consensus(rec, ran);
-  const d = new Date(rec.created), two = n => String(n).padStart(2, "0");   // local time, like the list shows
-  const stamp = `${d.getFullYear()}-${two(d.getMonth() + 1)}-${two(d.getDate())}-${two(d.getHours())}${two(d.getMinutes())}${two(d.getSeconds())}`;
-  const base = `ipa-${stamp}`;
+  const base = baseName(rec, cons);
   const txt = [`Consenso: ${cons.map(s => s.sym).join("")}`,
     ...(rec.edited ? [`Editado: ${rec.edited.join("")}`] : []),
     `Sem maioria: ${cons.filter(s => !s.agreed).map(s => s.sym).join(" ") || "(nenhum)"}`,

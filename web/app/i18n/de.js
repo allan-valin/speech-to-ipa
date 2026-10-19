@@ -163,4 +163,6 @@ export default {
   "theme.dark": "Dunkles Design.",
   "res.wrap": "Zeilenumbruch erlauben",
   "res.scroll": "Transkription seitlich scrollen",
+  "recs.exportAll": "Alle exportieren (.zip)",
+  "exp.packing": "Packe {n} Aufnahme(n) in ein .zip, jede in einem eigenen Ordner…",
 };

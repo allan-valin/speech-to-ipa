@@ -2,7 +2,7 @@ import { MODELS, ORDER } from "./models.js";
 import * as engine from "./engine.js";
 import * as store from "./store.js";
 import { grid } from "./vote.js";
-import { bundle, zip, consensus } from "./export.js";
+import { bundle, zip, zipAll, consensus } from "./export.js";
 import { recordingsFrom } from "./importer.js";
 import { insertLeft, insertRight, swap, addMark, removeAt } from "./edit.js";
 import { CHART, shown } from "./ipachart.js";
@@ -555,7 +555,19 @@ function exportFile() {
 
 async function saveExport() {
   if (!current || !ranModels(current).length) { say(t("exp.nothing"), "bad"); return; }
-  const file = exportFile();
+  await saveFile(exportFile());
+}
+
+async function saveAll() {
+  let recs = [];
+  try { recs = await store.list(); } catch (e) { say(t("store.readBad", { err: e.message }), "bad"); return; }
+  if (!recs.length) { say(t("recs.none"), "bad"); return; }
+  say(t("exp.packing", { n: recs.length }));
+  const { name, data } = zipAll(recs);
+  await saveFile(new File([data], name, { type: "application/zip" }));
+}
+
+async function saveFile(file) {
   if (window.showSaveFilePicker) {
     try {
       const handle = await showSaveFilePicker({ suggestedName: file.name, types: [{ description: "Zip", accept: { "application/zip": [".zip"] } }] });
@@ -657,6 +669,7 @@ $("redo").onclick = () => {
 $("run-missing").onclick = () => runModels(checked());
 $("play-all").onclick = () => play();
 $("export").onclick = saveExport;
+$("export-all").onclick = saveAll;
 $("share").onclick = shareExport;
 $("imp-dir").onchange = e => { importFiles(e.target.files); e.target.value = ""; };
 $("imp-zip").onchange = e => { importFiles(e.target.files); e.target.value = ""; };

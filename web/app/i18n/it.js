@@ -164,4 +164,6 @@ export default {
   "theme.dark": "Tema scuro.",
   "res.wrap": "Consenti di andare a capo",
   "res.scroll": "Scorri la trascrizione in orizzontale",
+  "recs.exportAll": "Esporta tutte (.zip)",
+  "exp.packing": "Raccolgo {n} registrazione/i in un .zip, ognuna nella sua cartella…",
 };

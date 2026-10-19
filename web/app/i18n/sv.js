@@ -164,4 +164,6 @@ export default {
   "theme.dark": "Mörkt tema.",
   "res.wrap": "Tillåt radbrytning",
   "res.scroll": "Rulla transkriptionen i sidled",
+  "recs.exportAll": "Exportera alla (.zip)",
+  "exp.packing": "Packar {n} inspelning(ar) i en .zip, var och en i en egen mapp…",
 };
