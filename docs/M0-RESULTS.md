@@ -1,0 +1,65 @@
+# M0 results (2026-10-19)
+
+All numbers: gold VoxAngeles references, scored with phonetic-eval's `evaluate.py`
+(narrow; broad in the last two columns), on a **760-file subset: 8 utterances from
+each of the 95 languages** (all 21 families). The subset reads 2–3 PER points easier
+than the full 5,416 set (PhoneticXeus 48.9 vs 51.9, ZIPA 62.1 vs 64.2); rankings hold.
+Use it for comparisons between rows, not as absolute numbers.
+
+## Single models, vote, int8
+
+| Run | PER | PFER | PER broad | PFER broad |
+|---|---|---|---|---|
+| **vote5** (all five, backbone PhoneticXeus) | **46.8** | **13.8** | 38.3 | 13.3 |
+| PhoneticXeus (PyTorch) | 48.9 | 14.0 | 40.2 | 13.5 |
+| PhoneticXeus ONNX fp32 | 48.9 | 14.0 | 40.2 | 13.5 |
+| PhoneticXeus ONNX **int8** (582 MB) | 49.4 | 14.6 | 40.6 | 14.3 |
+| POWSM (no language hint) | 56.2 | 17.6 | 47.3 | 17.0 |
+| ZIPA small (ONNX fp32, 260 MB) | 62.1 | 18.9 | 49.2 | 16.8 |
+| ZIPA small ONNX **int8** (official, 71 MB) | 62.4 | 19.0 | 49.4 | 17.0 |
+| Allophant | 71.5 | 22.2 | 50.1 | 20.4 |
+| WhIPA base | 86.0 | 28.5 | 68.8 | 26.8 |
+
+- **int8 is fine**: +0.5 PER / +0.6 PFER for PhoneticXeus, +0.3 PER for ZIPA.
+- The ONNX export of PhoneticXeus is exact (fp32 ONNX = PyTorch).
+
+## The vote
+
+- PER 46.8 vs 48.9 for PhoneticXeus alone: −2.1 points (4% relative). Small.
+- **The highlighting is the real value**: 77% of phones get a majority (≥ 3 of 5).
+  Agreed phones are correct **69.1%** of the time; flagged phones **31.4%**. A flag
+  marks a symbol that is more than twice as likely to be wrong.
+- Variants are within 0.6 points of each other (top-3 only 47.4; four models 47.2;
+  merge order changed 46.9). Five stays: it gives 3-of-5 majorities without ties.
+
+## Things found on the way
+
+- **POWSM needs a language hint to behave.** The June harness passed each file's
+  ISO code (`<iso>`); the app cannot. With `<unk>` and the default length cap
+  (POWSM pads to 30 s, so up to ~750 tokens), one 1-second Sino-Tibetan word decoded
+  without end and exhausted GPU memory (and 6 GB RAM on CPU). The last 83 files were
+  run with `maxlenratio=0.1` (≤ ~75 tokens); one file came out empty. The app needs
+  that cap. Its June full-set 55.5 PER was with the hint; here 56.2 without.
+- **Allophant decodes against a fixed phone inventory** (union of 16 languages in
+  the harness). That restricts its output — a mild version of the "no language
+  setting" rule. To check: a universal inventory option.
+- **PhoneticXeus's vocabulary includes narrow units** (`ʎː`, `œ̞`, `o̤`, `kˀ`), so it
+  can emit length and diacritics.
+- PhoneticXeus export needed one change: its frontend's `F.layer_norm(x, x.shape)`
+  cannot be traced with a dynamic length; the same normalisation is done in the
+  wrapper (`eval/export_pxeus_onnx.py`).
+- Speed on this laptop's CPU (onnxruntime, 760 clips of ~1 s): PhoneticXeus fp32
+  2.0 min, int8 4.2 min (dynamic int8 is slower on this CPU — check in the browser).
+
+## Still open in M0
+
+- ONNX export of POWSM (encoder-decoder + beam search), WhIPA (Whisper — optimum
+  exports exist for Whisper), Allophant; int8 check for each.
+- Bare web page timing (Redmi Chrome, desktop, iPhone).
+
+## Reproduce
+
+Work dir `m0work/` (gitignored): phonetic-eval scripts, VoxAngeles, one env per
+model stack (hf, allophant, powsm), subset built from `build_full.py` output.
+Scripts in `eval/`: `vote.py` (+ tests), `run_vote.py`, `export_pxeus_onnx.py`,
+`run_onnx_ctc.py`.
