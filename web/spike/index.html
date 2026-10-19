@@ -43,13 +43,18 @@
 
   <div id="ipa"></div>
   <div id="log"></div>
+  <p class="note">Modelo: <a href="https://huggingface.co/changelinglab/PhoneticXeus">PhoneticXeus</a>
+    (Bharadwaj et al., 2026), convertido para ONNX int8 —
+    <a href="https://huggingface.co/allan-valin/phoneticxeus-onnx">cópia modificada</a>,
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>. Uso não comercial.</p>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.30.0/dist/ort.all.min.js" crossorigin="anonymous"></script>
 <script>
 const params = new URLSearchParams(location.search);
-const MODEL_URL = params.get("model") || "models/pxeus.int8.onnx";
-const VOCAB_URL = params.get("vocab") || "models/ipa_vocab.json";
+const HF = "https://huggingface.co/allan-valin/phoneticxeus-onnx/resolve/main/";
+const MODEL_URL = params.get("model") || HF + "model.int8.onnx";
+const VOCAB_URL = params.get("vocab") || HF + "ipa_vocab.json";
 const $ = id => document.getElementById(id);
 ort.env.wasm.numThreads = navigator.hardwareConcurrency || 4;
 let session = null, id2sym = null, stream = null, recorder = null, chunks = [];
