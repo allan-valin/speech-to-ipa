@@ -624,7 +624,7 @@ async function renderRecordings() {
     const ipa = rec.edited ? rec.edited.join("") : ran.length ? consensus(rec, ran).map(s => s.sym).join("") : "";
     row.innerHTML = `<span class="muted">${new Date(rec.created).toLocaleString(lang())} · ${secs(rec.wav.length / 16000)}</span>
       ${rec.name ? `<b class="rec-name"></b>` : ""}
-      <span class="ipa-mini">${ipa || `<span class="muted">${t(ran.length ? "res.nothing" : "recs.noIpa")}</span>`}</span>`;
+      <span class="ipa-mini" title="${ipa}">${ipa || `<span class="muted">${t(ran.length ? "res.nothing" : "recs.noIpa")}</span>`}</span>`;
     if (rec.name) row.querySelector(".rec-name").textContent = rec.name;
     const ren = document.createElement("button"); ren.textContent = t("recs.rename");
     ren.onclick = async () => {
