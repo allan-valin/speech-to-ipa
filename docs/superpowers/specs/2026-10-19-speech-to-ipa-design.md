@@ -40,7 +40,7 @@ PhoneticXeus added 2026-10-19 with the same harness and references):
 | Model | Base | Params | ~int8 size | Gold PER | Gold PFER | Weights licence |
 |---|---|---|---|---|---|---|
 | PhoneticXeus | XEUS (4k langs) | 575M | ~600 MB | **51.9** | **14.1** | CC-BY-NC-SA-4.0 |
-| POWSM | from scratch, IPAPack++ | 350M | ~350 MB | 55.5 | 16.1 | CC-BY-4.0 |
+| POWSM (CTC head) | from scratch, IPAPack++ | 350M (encoder ~200M) | 214 MB | 55.5* | 16.1* | CC-BY-4.0 |
 | ZIPA small | Zipformer, IPAPack++ | 64M | ~70 MB | 64.2 | 18.0 | CC-BY-NC-SA-4.0 |
 | WhIPA base | Whisper base | 74M | ~75 MB | 83.7 | 27.1 | Apache-2.0 |
 | MultIPA | XLSR-53 | 300M | ~320 MB | 62.4 | 15.0 | MIT (author, 2026-10-19) |
@@ -57,7 +57,10 @@ PhoneticXeus added 2026-10-19 with the same harness and references):
 - Excluded: wav2vec2phoneme (phonemic-only output), ZIPA large (copy of small),
   WhIPA large (1550M), Allosaurus (91.7 PER), BranchShine (no public weights; its
   paper is not comparable — IPAPack++ split, CER).
-- WhIPA and POWSM decode autoregressively (can hallucinate); fine inside a vote.
+- *POWSM's June numbers are with its attention decoder and a language hint; the app
+  uses its CTC head only (no hint, no looping), which is better: 53.2 / 14.7 vs
+  56.2 / 17.6 on the M0 subset.
+- WhIPA decodes autoregressively (can hallucinate); fine inside a vote.
 - Everything else is CTC: frame posteriors → greedy decode → per-symbol timestamps.
 
 ## Voting

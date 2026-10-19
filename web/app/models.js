@@ -1,6 +1,7 @@
 // The five voters. `ready: false` = not exported for the browser yet (M0 open item).
-// Every ONNX file here takes 16 kHz mono audio: either the raw waveform ("wave")
-// or ZIPA's 80-band filterbank ("fbank"), and returns per-frame CTC scores.
+// Every ONNX file here takes 16 kHz mono audio, as the raw waveform ("wave"),
+// ZIPA's 80-band Kaldi filterbank ("fbank") or POWSM's normalised log-mel ("logmel"),
+// and returns per-frame CTC scores.
 
 const HF = "https://huggingface.co";
 
@@ -14,9 +15,12 @@ export const MODELS = [
     source: `${HF}/changelinglab/PhoneticXeus`, copy: `${HF}/allan-valin/phoneticxeus-onnx`,
   },
   {
-    id: "powsm", name: "POWSM", ready: false, mb: 350,
+    // encoder + CTC head only: no language prompt, no runaway decoding, better on gold
+    id: "powsm", name: "POWSM", ready: true, mb: 214, input: "logmel",
+    url: `${HF}/allan-valin/powsm-ctc-onnx/resolve/main/model.int8.onnx`,
+    vocab: { url: `${HF}/allan-valin/powsm-ctc-onnx/resolve/main/vocab.json`, format: "json" },
     credit: "Li et al. 2025", license: "CC BY 4.0", licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
-    source: `${HF}/espnet/powsm`,
+    source: `${HF}/espnet/powsm`, copy: `${HF}/allan-valin/powsm-ctc-onnx`,
   },
   {
     id: "zipa", name: "ZIPA", ready: true, mb: 71, input: "fbank",

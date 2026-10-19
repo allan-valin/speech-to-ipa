@@ -1,11 +1,11 @@
 // Loading models (download once, keep in the browser cache) and running them.
 // `ort` is the global from onnxruntime-web, loaded by index.html.
-import { computeFbank } from "./fbank.js";
+import { computeFbank, computeLogmel } from "./fbank.js";
 import { greedyCtc } from "./ctc.js";
 import { parseVocab } from "./models.js";
 
 const CACHE = "ipa-models-v1";
-let fbankCfg = null;
+let fbankCfg = null, logmelCfg = null;
 
 async function cached(url) {
   try { return await (await caches.open(CACHE)).match(url); } catch { return null; }
@@ -48,6 +48,7 @@ export async function forget(model) {
 
 export async function load(model, backend, onProgress) {
   if (model.input === "fbank" && !fbankCfg) fbankCfg = await (await fetch("fbank80.json")).json();
+  if (model.input === "logmel" && !logmelCfg) logmelCfg = await (await fetch("powsm_frontend.json")).json();
   const [{ bytes, fromCache, stored }, vocabText] = await Promise.all([
     fetchBytes(model.url, onProgress),
     fetch(model.vocab.url).then(r => r.text()),
@@ -66,6 +67,13 @@ export async function transcribe(model, loaded, wav) {
       x_lens: new ort.Tensor("int64", BigInt64Array.from([BigInt(frames)]), [1]),
     };
     outName = "log_probs";
+  } else if (model.input === "logmel") {
+    const { data, frames } = computeLogmel(wav, logmelCfg);
+    feeds = {
+      feats: new ort.Tensor("float32", data, [1, frames, 80]),
+      feats_lens: new ort.Tensor("int64", BigInt64Array.from([BigInt(frames)]), [1]),
+    };
+    outName = "logits";
   } else {
     feeds = { wav: new ort.Tensor("float32", wav, [1, wav.length]) };
     outName = "logits";

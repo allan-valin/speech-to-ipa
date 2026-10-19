@@ -52,3 +52,31 @@ export function computeFbank(wav, cfg) {
   }
   return { data: out, frames };
 }
+
+// ESPnet's default front end (POWSM): centred STFT (reflect padding, Hann window
+// centred in the 512-point frame, hop 160), power spectrum, 80 mel filters, natural
+// log of max(·, 1e-10), then global mean/variance normalisation. Constants come from
+// powsm_frontend.json, dumped from the model (eval/export_powsm_onnx.py).
+export function computeLogmel(wav, cfg) {
+  const { fft: nfft, shift, window, filters, mean, std, normMeans, normVars } = cfg;
+  const n = wav.length, half = nfft / 2;
+  const frames = 1 + Math.floor(n / shift);
+  const at = i => (i < 0 ? wav[-i] : i >= n ? wav[2 * (n - 1) - i] : wav[i]);   // torch "reflect"
+  const out = new Float32Array(frames * filters.length);
+  const re = new Float64Array(nfft), im = new Float64Array(nfft);
+  for (let t = 0; t < frames; t++) {
+    const start = t * shift - half;
+    for (let i = 0; i < nfft; i++) { re[i] = at(start + i) * window[i]; im[i] = 0; }
+    fft(re, im);
+    for (let k = 0; k < filters.length; k++) {
+      const { start: s, weights } = filters[k];
+      let e = 0;
+      for (let j = 0; j < weights.length; j++) e += (re[s + j] ** 2 + im[s + j] ** 2) * weights[j];
+      let x = Math.log(Math.max(e, 1e-10));
+      if (normMeans) x -= mean[k];
+      if (normVars) x /= std[k];
+      out[t * filters.length + k] = x;
+    }
+  }
+  return { data: out, frames };
+}

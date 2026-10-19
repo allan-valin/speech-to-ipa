@@ -78,6 +78,23 @@ Ideas to test next: fp16 model on WebGPU (int8 MatMulInteger likely runs slow or
 emulated), fp32 on WASM (2.3 GB, too big for phones), coi-serviceworker so GitHub
 Pages gets cross-origin isolation.
 
+## POWSM: CTC head instead of the decoder
+
+POWSM is a joint CTC/attention model. Decoding with **only its CTC head** (encoder
+→ `ctc_lo` → greedy) needs no language prompt, cannot loop, and is better on gold:
+
+| POWSM decoding (760 subset) | PER | PFER |
+|---|---|---|
+| attention decoder, `<unk>` language (as M0 above) | 56.2 | 17.6 |
+| **CTC head only** | **53.2** | **14.7** |
+| CTC head, ONNX int8 (214 MB) | 53.9 | 15.1 |
+
+Vote with POWSM-CTC (PhoneticXeus, POWSM-CTC, ZIPA, MultIPA, WhIPA): **PER 46.1 /
+PFER 13.6**; 79% of phones agreed; agreed right 69.6%, flagged 29.8%. The browser
+runs POWSM's front end (STFT → log-mel → global MVN) in JS (`computeLogmel`,
+checked against ESPnet fixtures) and the encoder+CTC as ONNX
+(`eval/export_powsm_onnx.py`, published as allan-valin/powsm-ctc-onnx).
+
 ## Browser app vs Python (95 clips, one per language)
 
 The M1 app's engine (`web/app/engine.js`) in headless Chromium, int8 models loaded
@@ -88,8 +105,9 @@ from Hugging Face, vs Python onnxruntime on the same int8 files:
 | PhoneticXeus | 41.4 / 11.5 | 41.3 / 11.0 |
 | MultIPA | 52.2 / 11.2 | 52.1 / 11.2 |
 | ZIPA | 48.4 / 14.3 | 54.7 / 14.5 |
+| POWSM-CTC | 43.9 / 11.0 | 43.4 / 10.7 |
 
-Speed per ~1 s clip (WASM, laptop): PhoneticXeus 3.0 s, MultIPA 1.8 s, ZIPA 0.07 s.
+Speed per ~1 s clip (WASM, laptop): PhoneticXeus 3.0 s, MultIPA 1.8 s, POWSM 1.4 s, ZIPA 0.07 s.
 
 - The browser must decode audio in a 16 kHz context: decoding at the default 48 kHz
   and resampling back changed MultIPA's output (`ʃøyjd` → `ʃeyd`).
@@ -103,8 +121,7 @@ Speed per ~1 s clip (WASM, laptop): PhoneticXeus 3.0 s, MultIPA 1.8 s, ZIPA 0.07
 
 ## Still open in M0
 
-- ONNX export of POWSM (encoder-decoder + beam search), WhIPA (Whisper — optimum
-  exports exist for Whisper), Allophant; int8 check for each.
+- ONNX export of WhIPA (Whisper encoder-decoder — the only non-CTC voter left).
 - Real-browser timing: Redmi Chrome (via `adb reverse`), desktop Chrome/Firefox
   with a GPU, iPhone if available.
 

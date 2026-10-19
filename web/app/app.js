@@ -108,7 +108,7 @@ async function renderModels() {
 function updateTotal() {
   const sel = checked(), mb = sel.reduce((a, m) => a + m.mb, 0);
   $("total").textContent = `${sel.length} modelo(s) marcado(s), ${mb >= 1000 ? (mb / 1000).toFixed(1) + " GB" : mb + " MB"} no total. `
-    + `POWSM e WhIPA ainda não rodam no navegador.`;
+    + `WhIPA ainda não roda no navegador.`;
   $("heavy").hidden = mb < 900;
 }
 
