@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IPA — teste de velocidade</title>
+<style>
+  :root { --bg: #fafaf8; --fg: #1d1d1b; --muted: #6b6b66; --accent: #2a5db0; --line: #ddd; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #161615; --fg: #ececea; --muted: #9a9a94; --accent: #7aa7ff; --line: #333; } }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.5 system-ui, sans-serif; }
+  main { max-width: 640px; margin: 0 auto; padding: 16px; }
+  h1 { font-size: 1.3rem; margin: 0 0 4px; }
+  p.note { color: var(--muted); margin: 0 0 16px; font-size: .9rem; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; align-items: center; }
+  button, select, label.file { font: inherit; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--accent);
+    background: transparent; color: var(--accent); cursor: pointer; }
+  button:disabled { opacity: .4; cursor: default; }
+  input[type=file] { display: none; }
+  #ipa { font-size: 2rem; min-height: 2.5rem; margin: 16px 0; word-break: break-all; }
+  #bar { height: 4px; background: var(--line); border-radius: 2px; overflow: hidden; }
+  #bar div { height: 100%; width: 0; background: var(--accent); transition: width .2s; }
+  #log { font: 13px/1.4 ui-monospace, monospace; white-space: pre-wrap; border-top: 1px solid var(--line);
+    margin-top: 16px; padding-top: 8px; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Fala → IPA (teste)</h1>
+  <p class="note">Teste de velocidade do PhoneticXeus (int8, ~580 MB) no navegador. O primeiro carregamento
+    demora; o modelo fica no cache do navegador e precisa ser baixado de novo se o cache for limpo.</p>
+
+  <div class="row">
+    <select id="backend"><option value="wasm">WASM (CPU)</option><option value="webgpu">WebGPU</option></select>
+    <button id="load">Carregar modelo</button>
+  </div>
+  <div id="bar"><div></div></div>
+
+  <div class="row">
+    <button id="mic">Permitir microfone</button>
+    <button id="rec" disabled>Gravar</button>
+    <label class="file">Escolher arquivo de áudio<input id="file" type="file" accept="audio/*"></label>
+  </div>
+
+  <div id="ipa"></div>
+  <div id="log"></div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.30.0/dist/ort.all.min.js" crossorigin="anonymous"></script>
+<script>
+const params = new URLSearchParams(location.search);
+const MODEL_URL = params.get("model") || "models/pxeus.int8.onnx";
+const VOCAB_URL = params.get("vocab") || "models/ipa_vocab.json";
+const $ = id => document.getElementById(id);
+ort.env.wasm.numThreads = navigator.hardwareConcurrency || 4;
+let session = null, id2sym = null, stream = null, recorder = null, chunks = [];
+
+function log(msg) { $("log").textContent = `[${new Date().toLocaleTimeString("pt-BR")}] ${msg}\n` + $("log").textContent; }
+function progress(f) { $("bar").firstElementChild.style.width = `${Math.round(f * 100)}%`; }
+
+async function fetchWithProgress(url) {
+  const cache = await caches.open("ipa-models").catch(() => null);
+  const hit = cache && await cache.match(url);
+  if (hit) { log("Modelo encontrado no cache do navegador."); progress(1); return new Uint8Array(await hit.arrayBuffer()); }
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`download falhou: ${res.status}`);
+  const total = +res.headers.get("content-length") || 0, reader = res.body.getReader(), parts = [];
+  let got = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    parts.push(value); got += value.length;
+    if (total) progress(got / total);
+  }
+  const buf = new Uint8Array(got);
+  let off = 0; for (const p of parts) { buf.set(p, off); off += p.length; }
+  if (cache) await cache.put(url, new Response(buf)).catch(e => log(`Não deu para salvar no cache: ${e.message}`));
+  return buf;
+}
+
+$("load").onclick = async () => {
+  $("load").disabled = true;
+  try {
+    const t0 = performance.now();
+    log(`Baixando modelo (${MODEL_URL})…`);
+    const [bytes, vocab] = await Promise.all([fetchWithProgress(MODEL_URL), fetch(VOCAB_URL).then(r => r.json())]);
+    id2sym = Object.fromEntries(Object.entries(vocab).map(([s, i]) => [i, s]));
+    const t1 = performance.now();
+    log(`Download: ${((t1 - t0) / 1000).toFixed(1)} s (${(bytes.length / 1e6).toFixed(0)} MB). Criando sessão (${$("backend").value})…`);
+    session = await ort.InferenceSession.create(bytes, { executionProviders: [$("backend").value] });
+    log(`Sessão pronta em ${((performance.now() - t1) / 1000).toFixed(1)} s.`);
+  } catch (e) { log(`ERRO ao carregar: ${e.message}`); $("load").disabled = false; }
+};
+
+$("mic").onclick = async () => {
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    log("Microfone liberado."); $("mic").disabled = true; $("rec").disabled = false;
+  } catch (e) {
+    log(`Microfone bloqueado (${e.name}). Libere nas configurações do site: ícone ao lado do endereço → Permissões → Microfone.`);
+  }
+};
+
+$("rec").onclick = () => {
+  if (recorder && recorder.state === "recording") { recorder.stop(); $("rec").textContent = "Gravar"; return; }
+  chunks = []; recorder = new MediaRecorder(stream);
+  recorder.ondataavailable = e => chunks.push(e.data);
+  recorder.onstop = async () => transcribe(await new Blob(chunks).arrayBuffer());
+  recorder.start(); $("rec").textContent = "Parar"; log("Gravando…");
+};
+
+$("file").onchange = async e => { const f = e.target.files[0]; if (f) { log(`Arquivo: ${f.name}`); transcribe(await f.arrayBuffer()); } };
+
+async function to16kMono(buf) {
+  const decoded = await new AudioContext().decodeAudioData(buf);
+  const off = new OfflineAudioContext(1, Math.ceil(decoded.duration * 16000), 16000);
+  const src = off.createBufferSource(); src.buffer = decoded; src.connect(off.destination); src.start();
+  return (await off.startRendering()).getChannelData(0);
+}
+
+async function transcribe(buf) {
+  if (!session) { log("Carregue o modelo primeiro."); return; }
+  try {
+    const wav = await to16kMono(buf);
+    const t0 = performance.now();
+    const out = await session.run({ wav: new ort.Tensor("float32", wav, [1, wav.length]) });
+    const ms = performance.now() - t0;
+    const [_, frames, v] = out.logits.dims, data = out.logits.data, phones = [];
+    let prev = -1;
+    for (let f = 0; f < frames; f++) {
+      let best = 0, bi = 0;
+      for (let k = 0; k < v; k++) { const x = data[f * v + k]; if (k === 0 || x > best) { best = x; bi = k; } }
+      const s = id2sym[bi] || "";
+      if (bi !== prev && !(s.startsWith("<") && s.endsWith(">"))) phones.push(s);
+      prev = bi;
+    }
+    $("ipa").textContent = phones.join("") || "(nada reconhecido)";
+    log(`Transcrito: ${(wav.length / 16000).toFixed(1)} s de áudio em ${(ms / 1000).toFixed(2)} s.`);
+  } catch (e) { log(`ERRO ao transcrever: ${e.message}`); }
+}
+</script>
+</body>
+</html>

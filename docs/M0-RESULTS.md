@@ -51,11 +51,32 @@ Use it for comparisons between rows, not as absolute numbers.
 - Speed on this laptop's CPU (onnxruntime, 760 clips of ~1 s): PhoneticXeus fp32
   2.0 min, int8 4.2 min (dynamic int8 is slower on this CPU — check in the browser).
 
+## Browser (web/spike/)
+
+`web/spike/index.html`: onnxruntime-web 1.30.0, PhoneticXeus int8, mic or file,
+greedy CTC in JS. Headless Chromium (Playwright) on this laptop (12 threads):
+
+- **Output identical** to the Python int8 run on the files checked.
+- Download 582 MB from localhost 2.8 s; session creation 2.8 s.
+- **WASM: ~2 s per 1 s of audio** at steady state, with or without cross-origin
+  isolation (threads). Python onnxruntime on the same CPU: ~0.3 s. So the browser
+  is ~6× slower here, and a phone will be slower still. Five models one after
+  another on a 5 s recording would take on the order of a minute on desktop.
+- **WebGPU headless: unusable** (software adapter; garbage output, 16 s). Needs a
+  real GPU browser before any conclusion.
+- Cache API `put` of the 582 MB model failed in headless (quota); to check in a
+  real browser profile.
+
+Ideas to test next: fp16 model on WebGPU (int8 MatMulInteger likely runs slow or
+emulated), fp32 on WASM (2.3 GB, too big for phones), coi-serviceworker so GitHub
+Pages gets cross-origin isolation.
+
 ## Still open in M0
 
 - ONNX export of POWSM (encoder-decoder + beam search), WhIPA (Whisper — optimum
   exports exist for Whisper), Allophant; int8 check for each.
-- Bare web page timing (Redmi Chrome, desktop, iPhone).
+- Real-browser timing: Redmi Chrome (via `adb reverse`), desktop Chrome/Firefox
+  with a GPU, iPhone if available.
 
 ## Reproduce
 
