@@ -42,7 +42,7 @@ PhoneticXeus added 2026-10-19 with the same harness and references):
 | PhoneticXeus | XEUS (4k langs) | 575M | ~600 MB | **51.9** | **14.1** | CC-BY-NC-SA-4.0 |
 | POWSM (CTC head) | from scratch, IPAPack++ | 350M (encoder ~200M) | 214 MB | 55.5* | 16.1* | CC-BY-4.0 |
 | ZIPA small | Zipformer, IPAPack++ | 64M | ~70 MB | 64.2 | 18.0 | CC-BY-NC-SA-4.0 |
-| WhIPA base | Whisper base | 74M | 291 MB (fp32) | 83.7 | 27.1 | Apache-2.0 |
+| WhIPA base | Whisper base | 74M | 146 MB (fp16) | 83.7 | 27.1 | Apache-2.0 |
 | MultIPA | XLSR-53 | 300M | ~320 MB | 62.4 | 15.0 | MIT (author, 2026-10-19) |
 | *(Allophant, reserve)* | XLS-R (128 langs) | 300M | ~320 MB | 71.0 | 20.5 | Apache-2.0 |
 
@@ -76,7 +76,7 @@ PhoneticXeus added 2026-10-19 with the same harness and references):
 ## Running models
 
 - Checkbox per model, each showing its size. Default: all five ticked; total
-  ~1.5 GB, with a warning that weak devices may crash.
+  ~1.3 GB, with a warning that weak devices may crash.
 - Only ticked models are downloaded.
 - Run mode: **one at a time** (default — load, transcribe, unload, next; lowest
   memory) or **all at once** (strong machines).

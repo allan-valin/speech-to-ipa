@@ -1,4 +1,4 @@
-"""Export WhIPA (Whisper base fine-tuned for IPA) to two ONNX int8 graphs + JS fixtures.
+"""Export WhIPA (Whisper base fine-tuned for IPA) to two ONNX graphs (fp32, int8, fp16) + JS fixtures.
 
     HF_HOME=... python eval/export_whipa_onnx.py <workdir> <outdir>
 
@@ -64,6 +64,12 @@ def main(workdir, outdir):
     for part in ("encoder", "decoder"):
         quantize_dynamic(os.path.join(outdir, f"{part}.onnx"), os.path.join(outdir, f"{part}.int8.onnx"),
                          weight_type=QuantType.QInt8)
+    # Shipped as fp16 (int8 shifted the greedy output; fp16 matched fp32 on 94/95 clips)
+    import onnx
+    from onnxconverter_common import float16
+    for part in ("encoder", "decoder"):
+        m16 = float16.convert_float_to_float16(onnx.load(os.path.join(outdir, f"{part}.onnx")), keep_io_types=True)
+        onnx.save(m16, os.path.join(outdir, f"{part}.fp16.onnx"))
     prompt = tok.convert_tokens_to_ids(["<|startoftranscript|>", "<|ip|>", "<|transcribe|>", "<|notimestamps|>"])
     vocab = tok.get_vocab()
     id2tok = [""] * (max(vocab.values()) + 1)

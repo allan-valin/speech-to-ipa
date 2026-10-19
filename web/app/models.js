@@ -39,9 +39,9 @@ export const MODELS = [
   },
   {
     // Whisper encoder + decoder, decoded greedily: whole strings, so no per-phone timing
-    id: "whipa", name: "WhIPA", ready: true, mb: 291, input: "whisper",   // fp32: int8 shifted its output
-    url: `${HF}/allan-valin/whipa-base-onnx/resolve/main/encoder.onnx`,
-    decoderUrl: `${HF}/allan-valin/whipa-base-onnx/resolve/main/decoder.onnx`,
+    id: "whipa", name: "WhIPA", ready: true, mb: 146, input: "whisper",   // fp16: int8 shifted its output
+    url: `${HF}/allan-valin/whipa-base-onnx/resolve/main/encoder.fp16.onnx`,
+    decoderUrl: `${HF}/allan-valin/whipa-base-onnx/resolve/main/decoder.fp16.onnx`,
     vocab: { url: `${HF}/allan-valin/whipa-base-onnx/resolve/main/tokens.json`, format: "whisper" },
     credit: "Suchardt et al. 2025", license: "Apache 2.0", licenseUrl: "https://www.apache.org/licenses/LICENSE-2.0",
     source: `${HF}/jshrdt/whipa-base-cv`, copy: `${HF}/allan-valin/whipa-base-onnx`,

@@ -18,7 +18,7 @@ Praat TextGrid. The interface is in Brazilian Portuguese.
 | [POWSM](https://huggingface.co/espnet/powsm) | encoder + CTC head, int8 ([copy](https://huggingface.co/allan-valin/powsm-ctc-onnx)) | 214 MB | CC BY 4.0 |
 | [ZIPA small](https://huggingface.co/anyspeech/zipa-small-crctc-ns-700k) | CTC, the authors' int8 | 71 MB | CC BY-NC-SA 4.0 |
 | [MultIPA](https://huggingface.co/ctaguchi/wav2vec2-large-xlsr-japlmthufielta-ipa1000-ns) | CTC, int8 ([copy](https://huggingface.co/allan-valin/multipa-onnx)) | 318 MB | MIT |
-| [WhIPA base](https://huggingface.co/jshrdt/whipa-base-cv) | Whisper, greedy, fp32 ([copy](https://huggingface.co/allan-valin/whipa-base-onnx)) | 291 MB | Apache 2.0 |
+| [WhIPA base](https://huggingface.co/jshrdt/whipa-base-cv) | Whisper, greedy, fp16 ([copy](https://huggingface.co/allan-valin/whipa-base-onnx)) | 146 MB | Apache 2.0 |
 
 Models were chosen on a gold benchmark (VoxAngeles, 95 languages) from
 [phonetic-eval](https://github.com/allan-valin/phonetic-eval). On 760 gold

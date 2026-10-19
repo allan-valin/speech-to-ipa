@@ -16,8 +16,8 @@ from run_inference import _load_audio_mono16k, save
 
 
 def main(d, name):
-    enc_file = os.environ.get("WHIPA_ENCODER", "encoder.onnx")       # int8 encoder hurts (docs/M0-RESULTS.md)
-    dec_file = os.environ.get("WHIPA_DECODER", "decoder.int8.onnx")
+    enc_file = os.environ.get("WHIPA_ENCODER", "encoder.fp16.onnx")  # int8 hurts; fp16 is shipped (docs/M0-RESULTS.md)
+    dec_file = os.environ.get("WHIPA_DECODER", "decoder.fp16.onnx")
     enc = ort.InferenceSession(f"{d}/{enc_file}", providers=["CPUExecutionProvider"])
     dec = ort.InferenceSession(f"{d}/{dec_file}", providers=["CPUExecutionProvider"])
     meta = json.load(open(f"{d}/tokens.json", encoding="utf-8"))

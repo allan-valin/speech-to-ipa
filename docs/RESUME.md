@@ -29,11 +29,12 @@ State on 2026-10-19, end of the evening session.
 ## Not verified / open
 
 1. **Real phone and real browsers** — nothing has run on Allan's Redmi or an
-   iPhone yet; headless had no microphone and a small cache quota (big models showed
-   "não coube no cache"). First thing to do with Allan: open the link on the Redmi.
+   iPhone yet. Headless covered the mic path only with Chromium's fake microphone
+   (record → WebM/Opus → 16 kHz → models works), and had a small cache quota (big
+   models showed "não coube no cache"). First thing with Allan: the link on the Redmi.
 2. WebGPU only tried headless (software adapter, useless).
 3. Speed: ~2–5 s per second of audio per big model on the laptop (WhIPA slowest:
-   decoder re-run per token). Ideas: KV-cache decoder export, fp16 WhIPA (291 MB now),
+   decoder re-run per token). Ideas: KV-cache decoder export,
    coi-serviceworker for WASM threads on Pages.
 4. phonetic-eval harness scores ZIPA's spaced diacritic tokens as separate phones
    (narrow PER ~3 points too high; paper's ZIPA rows likely affected). Allan's call.

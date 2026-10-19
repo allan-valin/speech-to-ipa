@@ -129,7 +129,9 @@ WhIPA 5.3 s (decoder re-run per token, no KV cache).
   the torch.export exporter and an explicit `positions` input). **Kept fp32**: int8
   shifted the greedy output (95 clips: int8 decoder 84.0 vs fp32 74.7), and
   onnxruntime-web's int8 kernels shift it differently from desktop onnxruntime.
-  fp32 in the browser reproduces PyTorch exactly. 291 MB; fp16 is a to-do.
+  fp32 in the browser reproduces PyTorch exactly (291 MB). **Shipped as fp16** (146 MB,
+  weights only; I/O stays float32): identical to fp32 on 94 of 95 clips, in Python and
+  in the browser, at the same speed.
 - WhIPA gives whole strings, so its phones carry no timing (`segmentIpa` splits them).
 
 ## The vote as the app runs it
@@ -137,7 +139,7 @@ WhIPA 5.3 s (decoder re-run per token, no KV cache).
 PhoneticXeus int8, POWSM-CTC int8, ZIPA int8 (tokens joined), MultIPA int8, WhIPA
 fp32 greedy, on the 760 subset: **PER 47.1 / PFER 14.4** (PhoneticXeus int8 alone
 49.4 / 14.6). 79.6% of phones agreed; agreed right **69.1%**, flagged **27.1%**.
-All five models ≈ 1.48 GB.
+All five models ≈ 1.33 GB (WhIPA fp16).
 
 ## Still open in M0
 
