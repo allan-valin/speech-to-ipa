@@ -166,4 +166,10 @@ export default {
   "res.scroll": "Scorri la trascrizione in orizzontale",
   "recs.exportAll": "Esporta tutte (.zip)",
   "exp.packing": "Raccolgo {n} registrazione/i in un .zip, ognuna nella sua cartella…",
+  "recs.rename": "Rinomina",
+  "recs.renamePrompt": "Nome di questa registrazione (vuoto = nessun nome; usato per i nomi dei file esportati):",
+  "recs.renameCancelled": "Rinomina annullata.",
+  "recs.renamed": "Rinominata: {name}.",
+  "recs.unnamed": "Nome rimosso; i file usano la trascrizione.",
+  "recs.nameHint": "I file esportati prendono il nome dall'elenco: data, durata e trascrizione. Alcuni programmi rovinano i simboli IPA nei nomi dei file; usa \"Rinomina\" per dare un nome semplice, che sostituisce la trascrizione nel nome del file (il contenuto non cambia).",
 };

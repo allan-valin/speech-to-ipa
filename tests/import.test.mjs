@@ -84,3 +84,11 @@ test("the system unzip keeps IPA in file names (Info-ZIP Unicode path field)", (
   const names = execFileSync("ls", [dir]).toString();
   assert.match(names, /2026-10-20_09-30-05_ipa_0\.1s_ɐ̃ʃ/);
 });
+
+test("a renamed recording uses its name instead of the IPA in file names, and keeps it on import", async () => {
+  const named = { ...rec, name: "opa / Allan, 1st try" };
+  const files = bundle(named, ran);
+  assert.ok(files[0].name.startsWith("2026-10-20_09-30-05_opa-Allan,-1st-try_0.1s/"), files[0].name);
+  const [back] = await recordingsFrom(await readZip(zip(files)));
+  assert.equal(back.name, "opa / Allan, 1st try");
+});

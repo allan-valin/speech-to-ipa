@@ -91,6 +91,7 @@ export async function recordingsFrom(files) {
       wav: to16k(parseWav(g.wav)),
       results: json?.results || {},
       ...(json?.edited ? { edited: json.edited } : {}),
+      ...(json?.name ? { name: json.name } : {}),
     });
   }
   return recs;

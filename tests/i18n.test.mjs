@@ -22,3 +22,12 @@ test("placeholders are filled; unknown language falls back to pt-BR", () => {
   assert.equal(t("model.on", { name: "ZIPA" }), "ZIPA selected.");
   setLang("pt-BR");
 });
+
+test("a key missing from a stale cached dictionary falls back to the page's own text, never the key", async () => {
+  const { applyStatic } = await import("../web/app/i18n.js");
+  const el = { dataset: { i18n: "no.such.key" }, textContent: "Exportar todas" };
+  const root = { querySelectorAll: sel => (sel === "[data-i18n]" ? [el] : []) };
+  globalThis.document ??= { title: "" };
+  applyStatic(root);
+  assert.equal(el.textContent, "Exportar todas");
+});

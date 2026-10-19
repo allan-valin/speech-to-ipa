@@ -31,16 +31,26 @@ export function setLang(code) {
 }
 
 /** Translated text; {name} placeholders filled from `vars`. Missing keys fall back to English, then Portuguese. */
-export function t(key, vars = {}) {
-  const s = cur.dict[key] ?? en[key] ?? pt[key] ?? key;
+export function t(key, vars = {}, fallback = key) {
+  const s = cur.dict[key] ?? en[key] ?? pt[key] ?? fallback;
   return s.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? `{${k}}`);
 }
 
 /** Fill elements marked data-i18n (text), data-i18n-html (markup) and data-i18n-title. */
 export function applyStatic(root) {
-  for (const el of root.querySelectorAll("[data-i18n]")) el.textContent = t(el.dataset.i18n);
-  for (const el of root.querySelectorAll("[data-i18n-html]")) el.innerHTML = t(el.dataset.i18nHtml);
-  for (const el of root.querySelectorAll("[data-i18n-title]")) el.title = t(el.dataset.i18nTitle);
+  // the page's own (Portuguese) text is kept as the fallback, in case a cached dictionary is older
+  for (const el of root.querySelectorAll("[data-i18n]")) {
+    el.dataset.orig ??= el.textContent;
+    el.textContent = t(el.dataset.i18n, {}, el.dataset.orig);
+  }
+  for (const el of root.querySelectorAll("[data-i18n-html]")) {
+    el.dataset.orig ??= el.innerHTML;
+    el.innerHTML = t(el.dataset.i18nHtml, {}, el.dataset.orig);
+  }
+  for (const el of root.querySelectorAll("[data-i18n-title]")) {
+    el.dataset.origTitle ??= el.title;
+    el.title = t(el.dataset.i18nTitle, {}, el.dataset.origTitle);
+  }
   document.title = t("title");
 }
 

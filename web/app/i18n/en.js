@@ -166,4 +166,10 @@ export default {
   "res.scroll": "Scroll the transcription sideways",
   "recs.exportAll": "Export all (.zip)",
   "exp.packing": "Packing {n} recording(s) into one .zip, each in its own folder…",
+  "recs.rename": "Rename",
+  "recs.renamePrompt": "Name for this recording (empty = no name; used for the exported file names):",
+  "recs.renameCancelled": "Rename cancelled.",
+  "recs.renamed": "Renamed: {name}.",
+  "recs.unnamed": "Name removed; files use the transcription.",
+  "recs.nameHint": "Exported files are named from the list: date, length and transcription. Some programs garble IPA symbols in file names; use \"Rename\" to give a plain name, which replaces the transcription in the file name (the contents stay the same).",
 };

@@ -166,4 +166,10 @@ export default {
   "res.scroll": "Rolar a transcrição para os lados",
   "recs.exportAll": "Exportar todas (.zip)",
   "exp.packing": "Juntando {n} gravação(ões) num .zip, cada uma na sua pasta…",
+  "recs.rename": "Renomear",
+  "recs.renamePrompt": "Nome desta gravação (vazio = sem nome; usado no nome dos arquivos exportados):",
+  "recs.renameCancelled": "Renomeação cancelada.",
+  "recs.renamed": "Renomeada: {name}.",
+  "recs.unnamed": "Nome removido; os arquivos usam a transcrição.",
+  "recs.nameHint": "Os arquivos exportados recebem o nome da lista: data, duração e a transcrição. Alguns programas estragam os símbolos do IPA no nome; use \"Renomear\" para dar um nome simples, que substitui a transcrição no nome do arquivo (o conteúdo não muda).",
 };

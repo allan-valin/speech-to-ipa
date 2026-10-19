@@ -95,10 +95,13 @@ const stamp = d => `${d.getFullYear()}-${two(d.getMonth() + 1)}-${two(d.getDate(
  * and the transcription (the edit if there is one). Characters that file systems
  * refuse become "-".
  */
+const safe = s => s.normalize("NFC").replace(/[\\/:*?"<>|‖\s]+/g, "-").replace(/^[-.]+|[-.]+$/g, "");
+
 export function baseName(rec, cons) {
-  const ipa = (rec.edited || cons.map(c => c.sym)).join("").normalize("NFC")
-    .replace(/[\\/:*?"<>|‖\s]+/g, "-").replace(/^[-.]+|[-.]+$/g, "");
   const secs = `${(rec.wav.length / 16000).toFixed(1)}s`;
+  // a name given with "Rename" replaces the IPA, which some unzip tools garble
+  if (rec.name && safe(rec.name)) return [stamp(new Date(rec.created)), [...safe(rec.name)].slice(0, 60).join(""), secs].join("_");
+  const ipa = safe((rec.edited || cons.map(c => c.sym)).join(""));
   return [stamp(new Date(rec.created)), "ipa", secs, [...ipa].slice(0, 40).join("")].filter(Boolean).join("_");
 }
 
@@ -126,6 +129,7 @@ export function bundle(rec, ran) {
     consensus: cons.map(({ sym, agreed, alternatives, start, end }) => ({ sym, agreed, alternatives, start, end })),
     results: Object.fromEntries(ran.map(id => [id, rec.results[id]])),
     ...(rec.edited ? { edited: rec.edited } : {}),
+    ...(rec.name ? { name: rec.name } : {}),
   };
   // inside a folder, so unzipping never mixes the files with others
   return [

@@ -133,6 +133,8 @@ button.rec.on { border-color: var(--rec); background: transparent; animation: pu
 .rec-item { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--line); }
 .rec-item.open { background: var(--accent-soft); border-radius: 8px; padding: 6px 8px; }
 .rec-item .ipa-mini { flex: 1; min-width: 8rem; font: 1.15rem "Charis SIL", "Noto Serif", serif; }
+.name-hint { border-top: 1px solid var(--line); padding-top: 8px; margin: 8px 0 0; }
+.rec-name { font-weight: 600; }
 .log { font: 13px/1.45 ui-monospace, monospace; white-space: pre-wrap; max-height: 14rem; overflow: auto; color: var(--muted); }
 
 /* options */

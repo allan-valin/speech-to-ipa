@@ -165,4 +165,10 @@ export default {
   "res.scroll": "Faire défiler la transcription horizontalement",
   "recs.exportAll": "Tout exporter (.zip)",
   "exp.packing": "Regroupement de {n} enregistrement(s) dans un .zip, chacun dans son dossier…",
+  "recs.rename": "Renommer",
+  "recs.renamePrompt": "Nom de cet enregistrement (vide = sans nom ; utilisé pour les noms des fichiers exportés) :",
+  "recs.renameCancelled": "Renommage annulé.",
+  "recs.renamed": "Renommé : {name}.",
+  "recs.unnamed": "Nom supprimé ; les fichiers utilisent la transcription.",
+  "recs.nameHint": "Les fichiers exportés sont nommés d'après la liste : date, durée et transcription. Certains programmes abîment les symboles API dans les noms de fichiers ; utilisez « Renommer » pour donner un nom simple, qui remplace la transcription dans le nom du fichier (le contenu ne change pas).",
 };

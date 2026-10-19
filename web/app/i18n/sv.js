@@ -166,4 +166,10 @@ export default {
   "res.scroll": "Rulla transkriptionen i sidled",
   "recs.exportAll": "Exportera alla (.zip)",
   "exp.packing": "Packar {n} inspelning(ar) i en .zip, var och en i en egen mapp…",
+  "recs.rename": "Byt namn",
+  "recs.renamePrompt": "Namn på inspelningen (tomt = inget namn; används i de exporterade filnamnen):",
+  "recs.renameCancelled": "Namnbytet avbröts.",
+  "recs.renamed": "Nytt namn: {name}.",
+  "recs.unnamed": "Namnet togs bort; filerna använder transkriptionen.",
+  "recs.nameHint": "Exporterade filer får namn från listan: datum, längd och transkription. Vissa program förvanskar IPA-tecken i filnamn; använd \"Byt namn\" för att ge ett enkelt namn, som ersätter transkriptionen i filnamnet (innehållet ändras inte).",
 };
