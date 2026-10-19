@@ -20,7 +20,11 @@ from run_inference import _load_audio_mono16k, save
 
 def main(model_path, vocab_path, name):
     vocab = json.load(open(vocab_path, encoding="utf-8"))
+    vocab = vocab.get("vocab", vocab)           # MultIPA's file wraps it with its blank id
     id2sym = {i: s for s, i in vocab.items()}
+    for i, s in id2sym.items():                 # [PAD] is MultIPA's blank, "|" its word gap
+        if s in ("[PAD]", "[UNK]", "|"):
+            id2sym[i] = "<" + s + ">" if s != "|" else " "
     session = ort.InferenceSession(model_path, providers=["CPUExecutionProvider"])
     outdir = f"results/{name}"
     os.makedirs(outdir, exist_ok=True)
