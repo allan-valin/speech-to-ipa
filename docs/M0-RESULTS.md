@@ -10,13 +10,15 @@ Use it for comparisons between rows, not as absolute numbers.
 
 | Run | PER | PFER | PER broad | PFER broad |
 |---|---|---|---|---|
-| **vote5** (all five, backbone PhoneticXeus) | **46.8** | **13.8** | 38.3 | 13.3 |
+| **vote5** (PhoneticXeus, POWSM, ZIPA, MultIPA, WhIPA) | **47.0** | **13.7** | 38.5 | 13.2 |
+| vote5 with Allophant instead of MultIPA | 46.8 | 13.8 | 38.3 | 13.3 |
 | PhoneticXeus (PyTorch) | 48.9 | 14.0 | 40.2 | 13.5 |
 | PhoneticXeus ONNX fp32 | 48.9 | 14.0 | 40.2 | 13.5 |
 | PhoneticXeus ONNX **int8** (582 MB) | 49.4 | 14.6 | 40.6 | 14.3 |
 | POWSM (no language hint) | 56.2 | 17.6 | 47.3 | 17.0 |
 | ZIPA small (ONNX fp32, 260 MB) | 62.1 | 18.9 | 49.2 | 16.8 |
 | ZIPA small ONNX **int8** (official, 71 MB) | 62.4 | 19.0 | 49.4 | 17.0 |
+| MultIPA | 61.1 | 14.6 | 48.0 | 14.1 |
 | Allophant | 71.5 | 22.2 | 50.1 | 20.4 |
 | WhIPA base | 86.0 | 28.5 | 68.8 | 26.8 |
 
@@ -24,6 +26,11 @@ Use it for comparisons between rows, not as absolute numbers.
 - The ONNX export of PhoneticXeus is exact (fp32 ONNX = PyTorch).
 
 ## The vote
+
+With MultIPA (licensed MIT on 2026-10-19) in place of Allophant: 80.5% of phones
+agreed; agreed phones right **67.6%**, flagged **29.5%** (`eval/flag_accuracy.py`).
+The numbers below were measured first with Allophant.
+
 
 - PER 46.8 vs 48.9 for PhoneticXeus alone: −2.1 points (4% relative). Small.
 - **The highlighting is the real value**: 77% of phones get a majority (≥ 3 of 5).

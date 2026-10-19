@@ -15,7 +15,7 @@ sys.path.insert(0, "scripts")
 from evaluate import to_phone_tokens  # same segmentation the scorer uses
 from vote import align, vote
 
-ORDER = ["phoneticxeus", "powsm", "zipa", "allophant", "whipa"]
+ORDER = ["phoneticxeus", "powsm", "zipa", "multipa", "whipa"]
 
 
 def main():

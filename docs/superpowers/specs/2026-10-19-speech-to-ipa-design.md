@@ -43,12 +43,14 @@ PhoneticXeus added 2026-10-19 with the same harness and references):
 | POWSM | from scratch, IPAPack++ | 350M | ~350 MB | 55.5 | 16.1 | CC-BY-4.0 |
 | ZIPA small | Zipformer, IPAPack++ | 64M | ~70 MB | 64.2 | 18.0 | CC-BY-NC-SA-4.0 |
 | WhIPA base | Whisper base | 74M | ~75 MB | 83.7 | 27.1 | Apache-2.0 |
-| Allophant | XLS-R (128 langs) | 300M | ~320 MB | 71.0 | 20.5 | Apache-2.0 |
-| *(MultIPA, pending)* | XLSR-53 | 300M | ~320 MB | 62.4 | 15.0 | **none** |
+| MultIPA | XLSR-53 | 300M | ~320 MB | 62.4 | 15.0 | MIT (author, 2026-10-19) |
+| *(Allophant, reserve)* | XLS-R (128 langs) | 300M | ~320 MB | 71.0 | 20.5 | Apache-2.0 |
 
-- MultIPA has no licence (HF card and GitHub) → cannot redistribute. Allophant is the
-  stand-in; MultIPA joins if its author adds a licence. Ceiling cost of the swap is
-  small: best-of-5 on gold 38.2 / 6.4 (Allophant) vs 37.7 / 6.5 (MultIPA).
+- MultIPA had no licence; on 2026-10-19 its author answered our issue and added MIT
+  to ctaguchi/multipa (the HF card still shows none — the reply covers the weights).
+  Allophant, the stand-in until then, is now the reserve; it also decodes against a
+  fixed phone inventory. M0 vote with MultIPA: PER 47.0 / PFER 13.7 (Allophant
+  46.8 / 13.8), see docs/M0-RESULTS.md.
 - Why these: lowest per-file error correlation with each other (e.g. PhoneticXeus vs
   WhIPA 0.25, vs POWSM 0.36), and together they hold most per-family wins. WhIPA is
   weak alone but disagrees most, which is what a voter needs.
@@ -87,7 +89,7 @@ PhoneticXeus added 2026-10-19 with the same harness and references):
   browser data deletes them — they will download again.
 - Every action answers visibly (log line + busy bar), per Allan's UI rule.
 - Result view with switch buttons:
-  **[Consensus] [PhoneticXeus] [POWSM] [ZIPA] [WhIPA] [Allophant] [All stacked]**
+  **[Consensus] [PhoneticXeus] [POWSM] [ZIPA] [MultIPA] [WhIPA] [All stacked]**
   - Consensus: disagreements highlighted, tap a slot for alternatives.
   - Single model: its transcription, slots that differ from consensus marked.
   - All stacked: every model's line, time-aligned.
@@ -110,7 +112,7 @@ PhoneticXeus added 2026-10-19 with the same harness and references):
 - CC-BY-NC-SA-4.0 (PhoneticXeus, ZIPA): credit + licence link in an About panel;
   our quantised ONNX copies are adapted material → published under the same licence,
   marked as modified. No monetisation, ever.
-- CC-BY-4.0 (POWSM): credit. Apache-2.0 (WhIPA, Allophant): notice.
+- CC-BY-4.0 (POWSM): credit. Apache-2.0 (WhIPA), MIT (MultIPA): notice.
 - App code: open licence compatible with the above (decide in M1).
 
 ## Milestones
@@ -142,7 +144,7 @@ reference sounds, MultIPA if licensed.
 
 ## Open items
 
-- MultIPA licence: issue opened on ctaguchi/multipa 2026-10-19; waiting for the author.
+- MultIPA licence: MIT added by the author 2026-10-19 (GitHub); HF card not yet tagged.
 - PhoneticXeus needs `transformers<5` in Python; check its ONNX export in M0.
 
 ### Draft issue for ctaguchi/multipa
