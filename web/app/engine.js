@@ -3,9 +3,10 @@
 import { computeFbank, computeLogmel } from "./fbank.js";
 import { greedyCtc } from "./ctc.js";
 import { parseVocab } from "./models.js";
+import { whisperLogmel, greedyDecode, segmentIpa } from "./whisper.js";
 
 const CACHE = "ipa-models-v1";
-let fbankCfg = null, logmelCfg = null;
+let fbankCfg = null, logmelCfg = null, whisperCfg = null;
 
 async function cached(url) {
   try { return await (await caches.open(CACHE)).match(url); } catch { return null; }
@@ -38,12 +39,16 @@ async function fetchBytes(url, onProgress) {
 
 /** Is the model file already in the browser cache? */
 export async function isCached(model) {
-  return model.url ? !!(await cached(model.url)) : false;
+  return model.url ? !!(await cached(model.url)) && (!model.decoderUrl || !!(await cached(model.decoderUrl))) : false;
 }
 
 /** Delete one model from the browser cache. */
 export async function forget(model) {
-  try { await (await caches.open(CACHE)).delete(model.url); } catch { /* nothing cached */ }
+  try {
+    const c = await caches.open(CACHE);
+    await c.delete(model.url);
+    if (model.decoderUrl) await c.delete(model.decoderUrl);
+  } catch { /* nothing cached */ }
 }
 
 export async function load(model, backend, onProgress) {
@@ -54,11 +59,27 @@ export async function load(model, backend, onProgress) {
     fetch(model.vocab.url).then(r => r.text()),
   ]);
   const session = await ort.InferenceSession.create(bytes, { executionProviders: [backend] });
-  return { session, ...parseVocab(vocabText, model.vocab.format), fromCache, stored };
+  const loaded = { session, ...parseVocab(vocabText, model.vocab.format), fromCache, stored };
+  if (model.input === "whisper") {
+    if (!whisperCfg) whisperCfg = await (await fetch("whisper_mel.json")).json();
+    const dec = await fetchBytes(model.decoderUrl);
+    loaded.decoder = await ort.InferenceSession.create(dec.bytes, { executionProviders: [backend] });
+    loaded.stored = loaded.stored !== false && dec.stored !== false;
+    const release = session.release.bind(session);
+    loaded.session = { release: async () => { await release(); await loaded.decoder.release(); } };
+    loaded.encoder = session;
+  }
+  return loaded;
 }
 
 /** Transcribe 16 kHz mono audio; phones carry start/end in seconds. */
 export async function transcribe(model, loaded, wav) {
+  if (model.input === "whisper") {
+    const feats = whisperLogmel(wav, whisperCfg);
+    const { hidden } = await loaded.encoder.run({ input_features: new ort.Tensor("float32", feats, [1, 80, 3000]) });
+    const cap = Math.max(Math.round(wav.length / 16000), 1) * 20 + 4;      // 20 phones per second
+    return segmentIpa(await greedyDecode(loaded.decoder, hidden, loaded.whisper, cap)).map(sym => ({ sym }));
+  }
   let feeds, outName;
   if (model.input === "fbank") {
     const { data, frames } = computeFbank(wav, fbankCfg);

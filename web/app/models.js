@@ -1,4 +1,4 @@
-// The five voters. `ready: false` = not exported for the browser yet (M0 open item).
+// The five voters, in the order they were ranked on gold.
 // Every ONNX file here takes 16 kHz mono audio, as the raw waveform ("wave"),
 // ZIPA's 80-band Kaldi filterbank ("fbank") or POWSM's normalised log-mel ("logmel"),
 // and returns per-frame CTC scores.
@@ -38,9 +38,13 @@ export const MODELS = [
     source: `${HF}/ctaguchi/wav2vec2-large-xlsr-japlmthufielta-ipa1000-ns`, copy: `${HF}/allan-valin/multipa-onnx`,
   },
   {
-    id: "whipa", name: "WhIPA", ready: false, mb: 75,
+    // Whisper encoder + decoder, decoded greedily: whole strings, so no per-phone timing
+    id: "whipa", name: "WhIPA", ready: true, mb: 291, input: "whisper",   // fp32: int8 shifted its output
+    url: `${HF}/allan-valin/whipa-base-onnx/resolve/main/encoder.onnx`,
+    decoderUrl: `${HF}/allan-valin/whipa-base-onnx/resolve/main/decoder.onnx`,
+    vocab: { url: `${HF}/allan-valin/whipa-base-onnx/resolve/main/tokens.json`, format: "whisper" },
     credit: "Suchardt et al. 2025", license: "Apache 2.0", licenseUrl: "https://www.apache.org/licenses/LICENSE-2.0",
-    source: `${HF}/jshrdt/whipa-base-cv`,
+    source: `${HF}/jshrdt/whipa-base-cv`, copy: `${HF}/allan-valin/whipa-base-onnx`,
   },
 ];
 
@@ -49,6 +53,7 @@ export const ORDER = ["phoneticxeus", "powsm", "zipa", "multipa", "whipa"];
 
 /** Parse a vocabulary file into { id2sym, blank }. */
 export function parseVocab(text, format) {
+  if (format === "whisper") return { whisper: JSON.parse(text) };   // prompt, eos, token strings
   if (format === "tokens") {                         // "<sym> <id>" per line (ZIPA)
     const id2sym = [];
     for (const line of text.split("\n")) {

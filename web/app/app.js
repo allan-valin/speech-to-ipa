@@ -108,7 +108,7 @@ async function renderModels() {
 function updateTotal() {
   const sel = checked(), mb = sel.reduce((a, m) => a + m.mb, 0);
   $("total").textContent = `${sel.length} modelo(s) marcado(s), ${mb >= 1000 ? (mb / 1000).toFixed(1) + " GB" : mb + " MB"} no total. `
-    + `WhIPA ainda não roda no navegador.`;
+    + `WhIPA não marca o tempo de cada símbolo; os outros modelos marcam.`;
   $("heavy").hidden = mb < 900;
 }
 

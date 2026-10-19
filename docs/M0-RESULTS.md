@@ -106,8 +106,10 @@ from Hugging Face, vs Python onnxruntime on the same int8 files:
 | MultIPA | 52.2 / 11.2 | 52.1 / 11.2 |
 | ZIPA | 48.4 / 14.3 | 54.7 / 14.5 |
 | POWSM-CTC | 43.9 / 11.0 | 43.4 / 10.7 |
+| WhIPA (fp32, greedy) | 74.7 / 26.1 | 74.7 / 26.1 (= PyTorch greedy) |
 
-Speed per ~1 s clip (WASM, laptop): PhoneticXeus 3.0 s, MultIPA 1.8 s, POWSM 1.4 s, ZIPA 0.07 s.
+Speed per ~1 s clip (WASM, laptop): PhoneticXeus 3.0 s, MultIPA 1.8 s, POWSM 1.4 s, ZIPA 0.07 s,
+WhIPA 5.3 s (decoder re-run per token, no KV cache).
 
 - The browser must decode audio in a 16 kHz context: decoding at the default 48 kHz
   and resampling back changed MultIPA's output (`ʃøyjd` → `ʃeyd`).
@@ -119,9 +121,27 @@ Speed per ~1 s clip (WASM, laptop): PhoneticXeus 3.0 s, MultIPA 1.8 s, POWSM 1.4
   same reason — to check in phonetic-eval. The app attaches such tokens to the
   previous phone (`web/app/ctc.js`).
 
+## WhIPA
+
+- Greedy decoding capped at 20 phones/s beats the harness's beam search + fallback
+  ladder: PER 79.3 / PFER 25.6 vs 86.0 / 28.5 (760 subset).
+- Exported as encoder + decoder ONNX (`eval/export_whipa_onnx.py`; the decoder needs
+  the torch.export exporter and an explicit `positions` input). **Kept fp32**: int8
+  shifted the greedy output (95 clips: int8 decoder 84.0 vs fp32 74.7), and
+  onnxruntime-web's int8 kernels shift it differently from desktop onnxruntime.
+  fp32 in the browser reproduces PyTorch exactly. 291 MB; fp16 is a to-do.
+- WhIPA gives whole strings, so its phones carry no timing (`segmentIpa` splits them).
+
+## The vote as the app runs it
+
+PhoneticXeus int8, POWSM-CTC int8, ZIPA int8 (tokens joined), MultIPA int8, WhIPA
+fp32 greedy, on the 760 subset: **PER 47.1 / PFER 14.4** (PhoneticXeus int8 alone
+49.4 / 14.6). 79.6% of phones agreed; agreed right **69.1%**, flagged **27.1%**.
+All five models ≈ 1.48 GB.
+
 ## Still open in M0
 
-- ONNX export of WhIPA (Whisper encoder-decoder — the only non-CTC voter left).
+- (done) WhIPA: see below.
 - Real-browser timing: Redmi Chrome (via `adb reverse`), desktop Chrome/Firefox
   with a GPU, iPhone if available.
 
