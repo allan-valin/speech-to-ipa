@@ -331,8 +331,9 @@ for (const r of document.querySelectorAll("input[name=mode]")) {
   r.onchange = () => { setPref("mode", r.value); log(r.value === "seq" ? "Modo: um de cada vez." : "Modo: todos ao mesmo tempo."); };
 }
 
+if (window.crossOriginIsolated) ort.env.wasm.numThreads = Math.min(navigator.hardwareConcurrency || 4, 8);
 renderCredits();
 renderModels();
 renderRecordings();
 checkMicPermission();
-log("Pronto. Autorize o microfone e grave, ou escolha um arquivo de áudio.");
+log(`Pronto (${window.crossOriginIsolated ? `${ort.env.wasm.numThreads} threads` : "1 thread"}). Autorize o microfone e grave, ou escolha um arquivo de áudio.`);
