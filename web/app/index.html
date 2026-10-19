@@ -10,84 +10,177 @@
 </head>
 <body>
 <main>
-  <header>
-    <h1>Fala → IPA</h1>
-    <p class="muted">Transcrição fonética estreita do que foi dito, não do que o dicionário diz.
-      Tudo roda no seu aparelho; o áudio não sai daqui.</p>
-  </header>
-
-  <p class="notice" id="first-load">Os modelos são grandes (70 a 580 MB cada). O primeiro download demora;
-    depois eles ficam guardados no navegador. Se você limpar os dados do navegador, eles serão baixados de novo.</p>
-
-  <section class="card" id="mic-card">
-    <h2>Microfone</h2>
-    <div class="row">
-      <button id="mic">Permitir microfone</button>
-      <span id="mic-state" class="muted">Ainda não autorizado.</span>
+  <header class="top">
+    <div>
+      <h1 data-i18n="title">Fala → IPA</h1>
+      <p class="muted" data-i18n="tagline">Transcrição fonética estreita do que foi dito, não do que o dicionário diz.
+        Tudo roda no seu aparelho; o áudio não sai daqui.</p>
     </div>
-    <p class="help" id="mic-help" hidden>O navegador bloqueou o microfone. Para liberar: toque no ícone ao lado do
-      endereço do site → Permissões (ou Configurações do site) → Microfone → Permitir. No iPhone:
-      Ajustes → Safari → Microfone. Depois recarregue a página.</p>
+    <button id="menu-btn" class="icon" aria-haspopup="dialog" data-i18n-title="menu" title="Menu">
+      <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+    </button>
+  </header>
+  <nav class="langs" id="langs" aria-label="Idioma"></nav>
+
+  <section class="notice" id="instructions">
+    <h2 data-i18n="instr.title">Instruções</h2>
+    <ol>
+      <li data-i18n-html="instr.1">Toque em <b>▶</b> para gravar e em <b>■</b> para parar.</li>
+      <li data-i18n-html="instr.2">Na primeira vez, o app pergunta se pode baixar os modelos (cerca de 1,3 GB com os cinco recomendados). Isso só demora na primeira vez.</li>
+      <li data-i18n-html="instr.3">O navegador vai pedir o <b>microfone</b> e pode perguntar se o site pode <b>guardar dados permanentemente</b>: aceite os dois. Os dados são os modelos, não as gravações; sem isso, o navegador pode apagá-los e eles serão baixados de novo.</li>
+      <li data-i18n-html="instr.4">No resultado, <b>toque nos símbolos</b> para ouvir cada som.</li>
+      <li data-i18n-html="instr.5">Escolher modelos, fontes e ajuda: botão <b>☰</b> no alto.</li>
+    </ol>
   </section>
 
   <section class="card">
-    <h2>Modelos</h2>
-    <div id="models"></div>
-    <p class="muted" id="total"></p>
-    <p class="warn" id="heavy" hidden>Muitos modelos juntos podem travar o navegador em aparelhos mais fracos.
-      Rodar um de cada vez é mais seguro.</p>
-    <fieldset class="row">
-      <legend>Como rodar</legend>
-      <label><input type="radio" name="mode" value="seq" checked> Um de cada vez (recomendado)</label>
-      <label><input type="radio" name="mode" value="all"> Todos ao mesmo tempo</label>
-    </fieldset>
-    <details>
-      <summary>Avançado</summary>
-      <label class="row">Processamento
-        <select id="backend"><option value="wasm">CPU (WASM)</option><option value="webgpu">GPU (WebGPU)</option></select>
-      </label>
-    </details>
-  </section>
-
-  <section class="card">
-    <h2>Gravar</h2>
+    <h2 data-i18n="rec.title">Gravar</h2>
     <div class="row">
-      <button id="rec" disabled>Gravar</button>
-      <label class="button">Escolher arquivo de áudio<input id="file" type="file" accept="audio/*" hidden></label>
+      <button id="rec" class="rec" data-i18n-title="rec.start" title="Gravar"><span class="shape play"></span></button>
+      <span id="rec-time" class="rec-time" hidden>0,0 s</span>
+      <label class="button"><span data-i18n="rec.file">Escolher arquivo de áudio</span><input id="file" type="file" accept="audio/*" hidden></label>
+    </div>
+    <p id="status" class="status" role="status" aria-live="polite"></p>
+    <div id="progress" class="progress" hidden>
+      <div class="bar"><div></div></div>
+      <span id="progress-label"></span>
     </div>
   </section>
 
   <section class="card" id="result" hidden>
-    <h2 id="result-title">Resultado</h2>
-    <div class="row" id="views" role="tablist"></div>
-    <div id="ipa" class="ipa"></div>
+    <h2 id="result-title" data-i18n="res.title">Resultado</h2>
+    <p class="tap-banner" data-i18n-html="res.tap">👆 Toque nos símbolos para ouvir cada som</p>
+    <div class="row checks">
+      <label><input type="checkbox" id="opt-wide"> <span data-i18n="res.wide">Mesma largura para todos os símbolos</span></label>
+      <label><input type="checkbox" id="opt-align"> <span data-i18n="res.align">Alinhar em colunas</span></label>
+    </div>
+    <div id="grid" class="grid"></div>
     <p class="muted" id="ipa-hint"></p>
     <div id="alts" class="alts" hidden></div>
+    <div id="edited-line" class="edited-line" hidden></div>
     <div class="row">
-      <button id="rerun">Rodar os modelos marcados nesta gravação</button>
-      <button id="play-all">Ouvir gravação</button>
+      <button id="edit" data-i18n="res.edit">Editar consenso</button>
+      <button id="play-all" data-i18n="res.play">Ouvir gravação</button>
+      <button id="run-missing" hidden></button>
+      <button id="redo" data-i18n="res.redo">Refazer do zero</button>
+    </div>
+    <div id="editor" class="editor" hidden>
+      <p class="muted" data-i18n="ed.hint">Toque num símbolo para selecioná-lo e escolha o que fazer.</p>
+      <div id="ed-tokens" class="ed-tokens"></div>
+      <div class="row">
+        <button id="ed-left" data-i18n="ed.left">← Inserir à esquerda</button>
+        <button id="ed-swap" data-i18n="ed.swap">Trocar símbolo</button>
+        <button id="ed-right" data-i18n="ed.right">Inserir à direita →</button>
+      </div>
+      <div class="row">
+        <button id="ed-mark" data-i18n="ed.mark">Adicionar diacrítico</button>
+        <button id="ed-del" data-i18n="ed.del">Apagar símbolo</button>
+      </div>
+      <div class="row">
+        <button id="ed-save" class="primary" data-i18n="ed.save">Salvar edição</button>
+        <button id="ed-cancel" data-i18n="ed.cancel">Cancelar</button>
+        <button id="ed-reset" data-i18n="ed.reset">Voltar ao consenso</button>
+      </div>
     </div>
     <div class="row">
-      <button id="export">Exportar (.zip)</button>
-      <button id="share" hidden>Compartilhar (ex.: Google Drive)</button>
+      <button id="export" data-i18n="res.export">Exportar (.zip)</button>
+      <button id="share" hidden data-i18n="res.share">Compartilhar (ex.: Google Drive)</button>
     </div>
-    <p class="muted">O .zip traz o áudio (WAV), a transcrição de cada modelo e o consenso (TXT), tempos e
-      alternativas (JSON) e um TextGrid para o Praat.</p>
+    <p class="muted" data-i18n="res.zip">O .zip traz uma pasta com o áudio (WAV), a transcrição de cada modelo, o consenso e a sua edição (TXT),
+      tempos e alternativas (JSON) e um TextGrid para o Praat.</p>
   </section>
 
   <section class="card">
-    <h2>Gravações</h2>
-    <div id="recordings"><p class="muted">Nenhuma gravação ainda.</p></div>
+    <h2 data-i18n="recs.title">Gravações</h2>
+    <div id="recordings"></div>
+    <div class="row">
+      <label class="button"><span data-i18n="recs.folder">Importar pasta</span><input id="imp-dir" type="file" webkitdirectory multiple hidden></label>
+      <label class="button"><span data-i18n="recs.zips">Importar .zip</span><input id="imp-zip" type="file" accept=".zip,.wav,.json,application/zip" multiple hidden></label>
+    </div>
+    <p class="muted" data-i18n="recs.importHint">Escolha a pasta onde você guarda as exportações (ou os próprios .zip): as gravações voltam para a lista com as transcrições.</p>
   </section>
 
-  <div id="busy" class="busy"><div></div></div>
-  <section class="card">
-    <h2>Registro</h2>
+  <details class="card">
+    <summary data-i18n="log.title">Registro (o que o app fez)</summary>
     <div id="log" class="log"></div>
-  </section>
-
-  <footer class="muted" id="credits"></footer>
+  </details>
 </main>
+
+<!-- ☰ menu: options, sources, help -->
+<div id="overlay" class="overlay" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="menu-title">
+    <div class="sheet-head">
+      <div class="tabs" role="tablist" id="menu-title">
+        <button role="tab" data-tab="options" data-i18n="menu.options">Opções</button>
+        <button role="tab" data-tab="sources" data-i18n="menu.sources">Fontes</button>
+        <button role="tab" data-tab="help" data-i18n="menu.help">Ajuda</button>
+      </div>
+      <button class="icon close" data-close data-i18n-title="close" title="Fechar">✕</button>
+    </div>
+
+    <div class="tab" data-pane="options">
+      <h3 data-i18n="opt.lang">Idioma</h3>
+      <div class="langs" id="langs-menu"></div>
+      <h3 data-i18n="mic.title">Microfone</h3>
+      <div class="row">
+        <button id="mic" data-i18n="mic.allow">Permitir microfone</button>
+        <span id="mic-state" class="muted"></span>
+      </div>
+      <p class="muted" data-i18n="mic.note">O microfone só fica ligado enquanto você grava.</p>
+      <p class="help" id="mic-help" hidden data-i18n="mic.blocked">O navegador bloqueou o microfone. Para liberar: toque no ícone ao lado do
+        endereço do site → Permissões (ou Configurações do site) → Microfone → Permitir. No iPhone:
+        Ajustes → Safari → Microfone. Depois recarregue a página.</p>
+
+      <h3 data-i18n="opt.models">Modelos</h3>
+      <p class="muted" data-i18n="opt.modelsNote">Recomendamos os cinco primeiros. Os outros vêm do mesmo artigo; veja em Ajuda por que estes cinco e quando trocar.</p>
+      <div id="models"></div>
+      <p class="muted" id="total"></p>
+      <p class="warn" id="heavy" hidden data-i18n="opt.heavy">Muitos modelos juntos podem travar o navegador em aparelhos mais fracos.
+        Rodar um de cada vez é mais seguro.</p>
+      <fieldset class="row">
+        <legend data-i18n="opt.how">Como rodar</legend>
+        <label><input type="radio" name="mode" value="seq" checked> <span data-i18n="opt.seq">Um de cada vez (recomendado)</span></label>
+        <label><input type="radio" name="mode" value="all"> <span data-i18n="opt.all">Todos ao mesmo tempo</span></label>
+      </fieldset>
+      <details>
+        <summary data-i18n="opt.advanced">Avançado</summary>
+        <label class="row"><span data-i18n="opt.backend">Processamento</span>
+          <select id="backend"><option value="wasm">CPU (WASM)</option><option value="webgpu">GPU (WebGPU)</option></select>
+        </label>
+      </details>
+    </div>
+
+    <div class="tab" data-pane="sources" id="sources"></div>
+    <div class="tab" data-pane="help" id="help"></div>
+  </div>
+</div>
+
+<!-- confirmation before the first download -->
+<div id="confirm" class="overlay" hidden>
+  <div class="sheet small" role="alertdialog" aria-modal="true">
+    <h3 data-i18n="dl.title">Baixar os modelos?</h3>
+    <p data-i18n="dl.text">Os modelos abaixo serão baixados para o seu aparelho para processar o áudio. Você pode apagá-los depois em ☰ → Opções, onde também pode escolher outros modelos e quais baixar (é preciso pelo menos um para ver resultados).</p>
+    <ul id="dl-list"></ul>
+    <p class="muted" data-i18n="dl.persist">Se o navegador perguntar se o site pode guardar dados permanentemente, aceite: são estes modelos.</p>
+    <div class="row">
+      <button id="dl-yes" class="primary" data-i18n="dl.yes">Baixar e transcrever</button>
+      <button id="dl-no" data-i18n="dl.no">Agora não</button>
+    </div>
+  </div>
+</div>
+
+<!-- IPA picker for the editor -->
+<div id="picker" class="overlay" hidden>
+  <div class="sheet wide" role="dialog" aria-modal="true">
+    <div class="sheet-head">
+      <h3 id="pk-title" data-i18n="pk.title">Escolha o tipo de símbolo</h3>
+      <button class="icon close" data-close data-i18n-title="close" title="Fechar">✕</button>
+    </div>
+    <div class="row" id="pk-cats"></div>
+    <div id="pk-body"></div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.30.0/dist/ort.all.min.js" crossorigin="anonymous"></script>
 <script type="module" src="app.js"></script>
 </body>

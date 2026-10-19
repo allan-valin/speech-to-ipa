@@ -21,3 +21,16 @@ test("PhoneticXeus plain vocab defaults blank to 0", () => {
 test("every model is in the vote order exactly once", () => {
   assert.deepEqual([...ORDER].sort(), MODELS.map(m => m.id).sort());
 });
+
+test("the five recommended models come first; every model has its paper and gold scores", () => {
+  assert.deepEqual(MODELS.filter(m => m.recommended).map(m => m.id), ["phoneticxeus", "powsm", "zipa", "multipa", "whipa"]);
+  assert.deepEqual(ORDER.slice(0, 5), ["phoneticxeus", "powsm", "zipa", "multipa", "whipa"]);
+  for (const m of MODELS) {
+    assert.ok(m.paper?.url && m.paper?.cite, m.id);
+    assert.ok(m.gold?.per > 0 && m.gold?.pfer > 0, m.id);
+    if (m.ready) assert.ok(m.url && m.mb, m.id);
+  }
+  // every model the paper benchmarked is offered (WhIPA large only as a note: too big)
+  for (const id of ["wav2vec2phoneme", "allophant", "allosaurus", "zipa_large", "whipa_comb"])
+    assert.ok(MODELS.some(m => m.id === id), id);
+});

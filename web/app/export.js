@@ -1,7 +1,7 @@
 // Export bundle: the recording (WAV), every model's IPA + the consensus (TXT),
 // timings/votes/alternatives (JSON) and a Praat TextGrid, packed in a plain zip.
 import { MODELS } from "./models.js";
-import { align, vote } from "./vote.js";
+import { grid } from "./vote.js";
 
 const NAMES = Object.fromEntries(MODELS.map(m => [m.id, m.name]));
 const enc = new TextEncoder();
@@ -81,24 +81,32 @@ export function textGrid(rec, ran, cons) {
     + tiers.map(([n, p], i) => `    item [${i + 1}]:\n${tier(n, p)}`).join("");
 }
 
+/** The consensus as shown on screen: columns aligned by time, empty decisions dropped. */
+export function consensus(rec, ran) {
+  return grid(Object.fromEntries(ran.map(id => [id, rec.results[id]])), ran).map(c => c.cons).filter(c => c.sym);
+}
+
 /** Files for one recording. `ran` = model ids in vote order that have results. */
 export function bundle(rec, ran) {
-  const cons = vote(align(Object.fromEntries(ran.map(id => [id, rec.results[id]])), ran), ran, ran[0]);
+  const cons = consensus(rec, ran);
   const d = new Date(rec.created), two = n => String(n).padStart(2, "0");   // local time, like the list shows
   const stamp = `${d.getFullYear()}-${two(d.getMonth() + 1)}-${two(d.getDate())}-${two(d.getHours())}${two(d.getMinutes())}${two(d.getSeconds())}`;
   const base = `ipa-${stamp}`;
   const txt = [`Consenso: ${cons.map(s => s.sym).join("")}`,
+    ...(rec.edited ? [`Editado: ${rec.edited.join("")}`] : []),
     `Sem maioria: ${cons.filter(s => !s.agreed).map(s => s.sym).join(" ") || "(nenhum)"}`,
     "", ...ran.map(id => `${NAMES[id]}: ${rec.results[id].map(p => p.sym).join("")}`)].join("\n") + "\n";
   const json = {
     created: new Date(rec.created).toISOString(), label: rec.label, seconds: rec.wav.length / 16000, models: ran,
     consensus: cons.map(({ sym, agreed, alternatives, start, end }) => ({ sym, agreed, alternatives, start, end })),
     results: Object.fromEntries(ran.map(id => [id, rec.results[id]])),
+    ...(rec.edited ? { edited: rec.edited } : {}),
   };
+  // inside a folder, so unzipping never mixes the files with others
   return [
-    { name: `${base}.wav`, data: wavBytes(rec.wav) },
-    { name: `${base}.txt`, data: enc.encode(txt) },
-    { name: `${base}.json`, data: enc.encode(JSON.stringify(json, null, 2)) },
-    { name: `${base}.TextGrid`, data: enc.encode(textGrid(rec, ran, cons)) },
+    { name: `${base}/${base}.wav`, data: wavBytes(rec.wav) },
+    { name: `${base}/${base}.txt`, data: enc.encode(txt) },
+    { name: `${base}/${base}.json`, data: enc.encode(JSON.stringify(json, null, 2)) },
+    { name: `${base}/${base}.TextGrid`, data: enc.encode(textGrid(rec, ran, cons)) },
   ];
 }

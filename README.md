@@ -10,7 +10,11 @@ grapheme-to-phoneme step. Five phone recognizers transcribe the same recording a
 vote; symbols without a majority are highlighted, and every model's reading stays
 visible. Tap a symbol to hear that slice of your own recording. Export a zip with
 the WAV, each model's IPA and the consensus, timings and alternatives (JSON) and a
-Praat TextGrid. The interface is in Brazilian Portuguese.
+Praat TextGrid, and import those zips (or the folder you keep them in) later.
+The consensus can be corrected by hand with an IPA chart picker. Interface in
+Brazilian Portuguese, English, German, Japanese, French, Italian, Swedish and Greek
+(the languages of the countries where the models' authors work; translations other
+than pt/en are machine-made and welcome corrections).
 
 | Model | Runs as | Size | Licence |
 |---|---|---|---|
@@ -20,6 +24,10 @@ Praat TextGrid. The interface is in Brazilian Portuguese.
 | [MultIPA](https://huggingface.co/ctaguchi/wav2vec2-large-xlsr-japlmthufielta-ipa1000-ns) | CTC, int8 ([copy](https://huggingface.co/allan-valin/multipa-onnx)) | 318 MB | MIT |
 | [WhIPA base](https://huggingface.co/jshrdt/whipa-base-cv) | Whisper, greedy, fp16 ([copy](https://huggingface.co/allan-valin/whipa-base-onnx)) | 146 MB | Apache 2.0 |
 
+Also selectable: ZIPA large (authors' int8, 310 MB). Listed but not converted yet:
+Wav2Vec2Phoneme, LoWhIPA comb, Allophant, Allosaurus — see ☰ → Help in the app for
+why the five and which to swap for which.
+
 Models were chosen on a gold benchmark (VoxAngeles, 95 languages) from
 [phonetic-eval](https://github.com/allan-valin/phonetic-eval). On 760 gold
 utterances (8 per language) the vote scores PER 47.1 / PFER 14.4, against 49.4 /
@@ -27,6 +35,24 @@ utterances (8 per language) the vote scores PER 47.1 / PFER 14.4, against 49.4 /
 time, highlighted ones 27%. Details: [docs/M0-RESULTS.md](docs/M0-RESULTS.md).
 
 Non-commercial: two of the models are licensed CC BY-NC-SA 4.0.
+
+## Run it locally
+
+No build step. You need Python 3 (or any static file server) and a browser.
+
+```sh
+git clone https://github.com/allan-valin/speech-to-ipa.git
+cd speech-to-ipa
+python3 -m http.server 8000
+```
+
+Open http://localhost:8000/web/app/ . `localhost` counts as a secure origin, so the
+microphone works. The models still download from Hugging Face the first time and
+are then kept in the browser. For a machine with no internet afterwards, also
+download onnxruntime-web 1.30.0 (`ort.all.min.js` and its `.wasm` files) into
+`web/app/` and point the `<script>` tag in `web/app/index.html` at the local copy.
+
+Tests: `npm test` (Node 20+) and `python -m pytest eval/`.
 
 ## Layout
 
