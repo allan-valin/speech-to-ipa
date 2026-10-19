@@ -1,6 +1,6 @@
 # Resume here
 
-State on 2026-10-19, end of the evening session.
+State on 2026-10-20 (after Allan's first phone test; it ran on the Redmi).
 
 ## What exists
 
@@ -16,6 +16,12 @@ State on 2026-10-19, end of the evening session.
 - Portfolio card (en/pt/de) with image in allan-valin.github.io (Tools section).
 - `web/spike/` is the M0 speed page (PhoneticXeus only); kept for timing tests.
 
+- 2026-10-20 feedback batch built and checked live (35 headless assertions,
+  scratchpad `ui2.cjs`): ☰ menu (Opções/Fontes/Ajuda), 8 interface languages with
+  flags, ▶/■, mic per take, download confirmation, labelled progress, one aligned
+  grid view, consensus editor with IPA chart picker, zip folder + import, ZIPA large.
+  Ledger: docs/FEEDBACK-2026-10-20.md (only M1 open).
+
 ## Verified
 
 - `npm test` (27 node tests) and `python -m pytest eval/` (7) pass.
@@ -28,8 +34,12 @@ State on 2026-10-19, end of the evening session.
 
 ## Not verified / open
 
-1. **Real phone and real browsers** — nothing has run on Allan's Redmi or an
-   iPhone yet. Headless covered the mic path only with Chromium's fake microphone
+0. **M1**: convert Wav2Vec2Phoneme, LoWhIPA comb, Allophant, Allosaurus (needs a new
+   HF write token from Allan; the old one was revoked 2026-10-20 and deleted locally).
+   Then measure swaps in the vote on the 760 subset before recommending any.
+0b. de/ja/fr/it/sv/el strings are machine translations: native check wanted.
+1. **Real phone and real browsers** — ran on Allan's Redmi 2026-10-19 (Chrome);
+   new UI not yet seen on the phone. No iPhone yet. Headless covered the mic path only with Chromium's fake microphone
    (record → WebM/Opus → 16 kHz → models works), and had a small cache quota (big
    models showed "não coube no cache"). First thing with Allan: the link on the Redmi.
 2. WebGPU only tried headless (software adapter, useless).
