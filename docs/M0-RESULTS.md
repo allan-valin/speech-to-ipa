@@ -121,6 +121,15 @@ WhIPA 5.3 s (decoder re-run per token, no KV cache).
   same reason — to check in phonetic-eval. The app attaches such tokens to the
   previous phone (`web/app/ctc.js`).
 
+## WASM threads (cross-origin isolation)
+
+GitHub Pages cannot send COOP/COEP, so the app vendors coi-serviceworker (MIT),
+which adds them; the page reloads once, then WASM runs threaded. Laptop, 10 clips,
+PhoneticXeus: 2.98 → 2.35 s per clip in a controlled test. On the live site, one 1 s
+clip, all five models: PhoneticXeus 4.8 → 2.0 s, POWSM 1.2 → 0.6 s, MultIPA 1.7 →
+0.5 s, WhIPA 3.8 → 1.1 s (fp16 too); ~11.5 s → 4.6 s of transcription in total. Model
+downloads from Hugging Face work under COEP (CORS responses).
+
 ## WhIPA
 
 - Greedy decoding capped at 20 phones/s beats the harness's beam search + fallback
