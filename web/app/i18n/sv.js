@@ -172,4 +172,5 @@ export default {
   "recs.renamed": "Nytt namn: {name}.",
   "recs.unnamed": "Namnet togs bort; filerna använder transkriptionen.",
   "recs.nameHint": "Exporterade filer får namn från listan: datum, längd och transkription. Vissa program förvanskar IPA-tecken i filnamn; använd \"Byt namn\" för att ge ett enkelt namn, som ersätter transkriptionen i filnamnet (innehållet ändras inte).",
+  "instr.sample": "Ett exempel på resultat (det isländska ordet ”bið”): varje rad är en modell, bandet nederst är konsensus. θ är markerat: ingen majoritet.",
 };

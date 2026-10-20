@@ -172,4 +172,5 @@ export default {
   "recs.renamed": "Rinominata: {name}.",
   "recs.unnamed": "Nome rimosso; i file usano la trascrizione.",
   "recs.nameHint": "I file esportati prendono il nome dall'elenco: data, durata e trascrizione. Alcuni programmi rovinano i simboli IPA nei nomi dei file; usa \"Rinomina\" per dare un nome semplice, che sostituisce la trascrizione nel nome del file (il contenuto non cambia).",
+  "instr.sample": "Un esempio di risultato (la parola islandese “bið”): ogni riga è un modello, la fascia in basso è il consenso. θ è evidenziato: nessuna maggioranza.",
 };

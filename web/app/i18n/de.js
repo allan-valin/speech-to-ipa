@@ -171,4 +171,5 @@ export default {
   "recs.renamed": "Umbenannt: {name}.",
   "recs.unnamed": "Name entfernt; die Dateien verwenden die Transkription.",
   "recs.nameHint": "Exportierte Dateien werden nach der Liste benannt: Datum, Dauer und Transkription. Manche Programme verstümmeln IPA-Zeichen in Dateinamen; mit „Umbenennen“ gibst du einen einfachen Namen, der die Transkription im Dateinamen ersetzt (der Inhalt bleibt gleich).",
+  "instr.sample": "Ein Beispielergebnis (das isländische Wort „bið“): jede Zeile ist ein Modell, das Band darunter ist der Konsens. θ ist hervorgehoben: keine Mehrheit.",
 };

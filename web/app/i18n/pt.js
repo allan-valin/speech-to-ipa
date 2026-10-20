@@ -172,4 +172,5 @@ export default {
   "recs.renamed": "Renomeada: {name}.",
   "recs.unnamed": "Nome removido; os arquivos usam a transcrição.",
   "recs.nameHint": "Os arquivos exportados recebem o nome da lista: data, duração e a transcrição. Alguns programas estragam os símbolos do IPA no nome; use \"Renomear\" para dar um nome simples, que substitui a transcrição no nome do arquivo (o conteúdo não muda).",
+  "instr.sample": "Exemplo de resultado (a palavra islandesa “bið”): cada linha é um modelo, a faixa de baixo é o consenso. θ está destacado: sem maioria.",
 };

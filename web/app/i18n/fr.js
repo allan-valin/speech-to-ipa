@@ -171,4 +171,5 @@ export default {
   "recs.renamed": "Renommé : {name}.",
   "recs.unnamed": "Nom supprimé ; les fichiers utilisent la transcription.",
   "recs.nameHint": "Les fichiers exportés sont nommés d'après la liste : date, durée et transcription. Certains programmes abîment les symboles API dans les noms de fichiers ; utilisez « Renommer » pour donner un nom simple, qui remplace la transcription dans le nom du fichier (le contenu ne change pas).",
+  "instr.sample": "Exemple de résultat (le mot islandais « bið ») : chaque ligne est un modèle, la bande du bas est le consensus. θ est surligné : pas de majorité.",
 };

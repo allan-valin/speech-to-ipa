@@ -36,6 +36,15 @@ function pref(key, fallback) { try { return JSON.parse(localStorage.getItem(key)
 function setPref(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* private mode */ } }
 const RECOMMENDED = MODELS.filter(m => m.recommended).map(m => m.id);
 
+// ---------- sample result in the instructions: real outputs on Icelandic "bið" (VoxAngeles) ----------
+const SAMPLE = { phoneticxeus: "p i θ", powsm: "b i s", zipa: "p i t s", multipa: "p i θ", whipa: "b i z" };
+function renderSample() {
+  const ran = Object.keys(SAMPLE), res = Object.fromEntries(ran.map(id => [id, SAMPLE[id].split(" ").map(sym => ({ sym }))]));
+  const box = $("sample");
+  box.innerHTML = "";
+  box.append(buildTable(grid(res, ran), ran, true));
+}
+
 // ---------- light / dark ----------
 function applyTheme() {
   const th = pref("theme", null);                  // null: follow the system
@@ -69,6 +78,7 @@ function renderLangs() {
 function refreshTexts() {
   applyStatic(document);
   applyTheme();
+  renderSample();
   renderLangs(); renderModels(); renderRecordings(); render(); renderMenuText(); checkMicPermission();
 }
 function renderMenuText() {
@@ -284,25 +294,8 @@ async function runModels(models, fresh = false) {
 // ---------- result: every model and the consensus, side by side ----------
 function ranModels(rec) { return ORDER.filter(id => rec.results[id]); }
 
-function render() {
-  if (!current) { $("result").hidden = true; return; }
-  $("result").hidden = false;
-  const ran = ranModels(current);
-  $("result-title").textContent = `${t("res.title")} — ${new Date(current.created).toLocaleString(lang())}`;
-  const missing = checked().filter(m => !current.results[m.id]);
-  $("run-missing").hidden = !missing.length || working;
-  $("run-missing").textContent = t("res.runMissing", { names: missing.map(m => m.name).join(", ") });
-  $("redo").disabled = $("edit").disabled = working;
-  $("alts").hidden = true;
-  const box = $("grid");
-  box.innerHTML = "";
-  box.classList.toggle("wide", $("opt-wide").checked);
-  if (!ran.length) {
-    $("ipa-hint").textContent = working ? t("res.working") : t("res.none");
-    return renderEdited();
-  }
-  const cols = grid(Object.fromEntries(ran.map(id => [id, current.results[id]])), ran);
-  const aligned = $("opt-align").checked;
+/** The side-by-side table: a label column, then one column per aligned slot (or one line per model). */
+function buildTable(cols, ran, aligned) {
   const rows = [...ran.map(id => ({ label: byId[id].name, cells: cols.map((col, k) => {
     const p = col.cells[id];
     return p ? cell(p.sym, k, cols, !col.cons.agreed) : gap(k);
@@ -338,6 +331,28 @@ function render() {
       line.append(seq); table.append(line);
     }
   }
+  return table;
+}
+
+function render() {
+  if (!current) { $("result").hidden = true; return; }
+  $("result").hidden = false;
+  const ran = ranModels(current);
+  $("result-title").textContent = `${t("res.title")} — ${new Date(current.created).toLocaleString(lang())}`;
+  const missing = checked().filter(m => !current.results[m.id]);
+  $("run-missing").hidden = !missing.length || working;
+  $("run-missing").textContent = t("res.runMissing", { names: missing.map(m => m.name).join(", ") });
+  $("redo").disabled = $("edit").disabled = working;
+  $("alts").hidden = true;
+  const box = $("grid");
+  box.innerHTML = "";
+  box.classList.toggle("wide", $("opt-wide").checked);
+  if (!ran.length) {
+    $("ipa-hint").textContent = working ? t("res.working") : t("res.none");
+    return renderEdited();
+  }
+  const cols = grid(Object.fromEntries(ran.map(id => [id, current.results[id]])), ran);
+  const table = buildTable(cols, ran, $("opt-align").checked);
   table.classList.toggle("wrap", $("opt-wrap").checked);
   box.append(table);
   requestAnimationFrame(syncScroll);
@@ -369,8 +384,8 @@ function cell(sym, k, cols, flag, extra = "") {
   s.textContent = sym;
   s.dataset.col = k;
   s.onclick = () => {
-    document.querySelectorAll(".ph.sel").forEach(x => x.classList.remove("sel"));
-    document.querySelectorAll(`.ph[data-col="${k}"]`).forEach(x => x.classList.add("sel"));
+    $("grid").querySelectorAll(".ph.sel").forEach(x => x.classList.remove("sel"));
+    $("grid").querySelectorAll(`.ph[data-col="${k}"]`).forEach(x => x.classList.add("sel"));
     const span = spanOf(cols[k]);
     if (span) play(span[0], span[1]); else say(t("play.noTime"));
     showAlternatives(cols[k]);

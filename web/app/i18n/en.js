@@ -172,4 +172,5 @@ export default {
   "recs.renamed": "Renamed: {name}.",
   "recs.unnamed": "Name removed; files use the transcription.",
   "recs.nameHint": "Exported files are named from the list: date, length and transcription. Some programs garble IPA symbols in file names; use \"Rename\" to give a plain name, which replaces the transcription in the file name (the contents stay the same).",
+  "instr.sample": "A sample result (the Icelandic word “bið”): each row is one model, the band below is the consensus. θ is highlighted: no majority.",
 };
