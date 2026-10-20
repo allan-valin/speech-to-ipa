@@ -57,15 +57,24 @@ export const MODELS = [
     credit: "Suchardt et al. 2025", license: "Apache 2.0", licenseUrl: "https://www.apache.org/licenses/LICENSE-2.0",
     source: `${HF}/jshrdt/whipa-base-cv`, copy: `${HF}/allan-valin/whipa-base-onnx`,
   },
-  // From the same paper, not converted for the browser yet: listed with their scores.
+  // The paper's other models.
   {
-    id: "wav2vec2phoneme", name: "Wav2Vec2Phoneme", ready: false, mb: 320, gold: { per: 53.0, pfer: 15.4 },
+    // int8 on MatMul only, per channel: full int8 cost 2 PER points (docs/M0-RESULTS.md)
+    id: "wav2vec2phoneme", name: "Wav2Vec2Phoneme", ready: true, mb: 357, input: "wave", gold: { per: 53.0, pfer: 15.4 },
+    url: `${HF}/allan-valin/wav2vec2phoneme-onnx/resolve/main/model.int8.onnx`,
+    vocab: { url: `${HF}/allan-valin/wav2vec2phoneme-onnx/resolve/main/vocab.json`, format: "json" },
+    copy: `${HF}/allan-valin/wav2vec2phoneme-onnx`,
     credit: "Xu et al. 2021", license: "Apache 2.0", licenseUrl: "https://www.apache.org/licenses/LICENSE-2.0",
     source: `${HF}/facebook/wav2vec2-xlsr-53-espeak-cv-ft`,
     paper: { cite: "Xu, Baevski, Auli. Simple and Effective Zero-shot Cross-lingual Phoneme Recognition. Interspeech 2022", url: "https://arxiv.org/abs/2109.11680" },
   },
   {
-    id: "whipa_comb", name: "LoWhIPA comb", ready: false, mb: 146, gold: { per: 77.8, pfer: 19.3 },
+    // LoRA adapter merged into whisper-base, same graphs as WhIPA
+    id: "whipa_comb", name: "LoWhIPA comb", ready: true, mb: 146, input: "whisper", gold: { per: 77.8, pfer: 19.3 },
+    url: `${HF}/allan-valin/lowhipa-base-comb-onnx/resolve/main/encoder.fp16.onnx`,
+    decoderUrl: `${HF}/allan-valin/lowhipa-base-comb-onnx/resolve/main/decoder.fp16.onnx`,
+    vocab: { url: `${HF}/allan-valin/lowhipa-base-comb-onnx/resolve/main/tokens.json`, format: "whisper" },
+    copy: `${HF}/allan-valin/lowhipa-base-comb-onnx`,
     credit: "Suchardt et al. 2025", license: "Apache 2.0", licenseUrl: "https://www.apache.org/licenses/LICENSE-2.0",
     source: `${HF}/jshrdt/lowhipa-base-comb`,
     paper: { cite: "Suchardt, El-Shazli, Cassotti. Towards Language-Agnostic STIPA. EMNLP 2025", url: "https://aclanthology.org/2025.emnlp-main.1600/" },

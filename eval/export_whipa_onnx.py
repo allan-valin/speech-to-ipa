@@ -1,6 +1,9 @@
 """Export WhIPA (Whisper base fine-tuned for IPA) to two ONNX graphs (fp32, int8, fp16) + JS fixtures.
 
-    HF_HOME=... python eval/export_whipa_onnx.py <workdir> <outdir>
+    HF_HOME=... python eval/export_whipa_onnx.py <workdir> <outdir> [model dir under models/] [lora]
+
+Default: WhIPA base (CV), full fine-tune. LoWhIPA comb: `models/lowhipa_base_comb lora`,
+whose LoRA adapter is merged into whisper-base before the export.
 
 encoder.onnx: input_features [1, 80, 3000] -> hidden [1, 1500, 512]
 decoder.onnx: input_ids [1, L] int64 + positions [L] + hidden -> logits [1, L, vocab] (no KV cache;
@@ -32,15 +35,20 @@ class Decoder(torch.nn.Module):
         return self.proj(out.last_hidden_state)
 
 
-def main(workdir, outdir):
+def main(workdir, outdir, model_dir="whipa_base_cv", lora=""):
     sys.path.insert(0, os.path.join(workdir, "corpora/whipa_repo/code"))
     sys.path.insert(0, os.path.join(workdir, "scripts"))
     from deploy import WHIPA
     from run_inference import _load_audio_mono16k
     os.makedirs(outdir, exist_ok=True)
-    w = WHIPA(model_path=os.path.join(workdir, "models/whipa_base_cv"), base_model_name="openai/whisper-base", lora=False)
-    model, tok, fe = w.model.eval(), w.tokenizer, w.processor.feature_extractor
+    w = WHIPA(model_path=os.path.join(workdir, "models", model_dir), base_model_name="openai/whisper-base", lora=lora == "lora")
+    model = w.model.merge_and_unload() if lora == "lora" else w.model      # LoRA: plain Whisper weights
+    model, tok, fe = model.eval(), w.tokenizer, w.processor.feature_extractor
 
+    # the browser's Whisper front end and its fixtures come from the default model only
+    if model_dir != "whipa_base_cv":
+        export_graphs(model, tok, outdir)
+        return
     with open(os.path.join(HERE, "web/app/whisper_mel.json"), "w") as f:
         json.dump({"filters": fe.mel_filters.T.tolist(), "fft": fe.n_fft, "shift": fe.hop_length,
                    "samples": fe.n_samples}, f)
@@ -50,6 +58,10 @@ def main(workdir, outdir):
         with open(os.path.join(HERE, f"tests/fixtures/whisper_{clip}.json"), "w") as f:
             json.dump({"wav": wav.tolist(), "feats": feats[:, :120].tolist(), "max": float(feats.max())}, f)
 
+    export_graphs(model, tok, outdir)
+
+
+def export_graphs(model, tok, outdir):
     feats = torch.zeros(1, 80, 3000)
     torch.onnx.export(model.model.encoder, (feats,), os.path.join(outdir, "encoder.onnx"),
                       input_names=["input_features"], output_names=["hidden"], opset_version=17, dynamo=False)
@@ -84,4 +96,4 @@ def main(workdir, outdir):
 
 
 if __name__ == "__main__":
-    main(*sys.argv[1:3])
+    main(*sys.argv[1:5])

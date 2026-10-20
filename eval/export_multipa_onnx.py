@@ -1,6 +1,9 @@
-"""Export MultIPA (wav2vec2 + CTC, raw 16 kHz waveform -> logits) to ONNX int8.
+"""Export a wav2vec2 + CTC phone model (raw 16 kHz waveform -> logits) to ONNX int8.
 
-    HF_HOME=... python eval/export_multipa_onnx.py <outdir>
+    HF_HOME=... python eval/export_multipa_onnx.py <outdir> [checkpoint]
+
+Default checkpoint: MultIPA. Also used for Wav2Vec2Phoneme
+(facebook/wav2vec2-xlsr-53-espeak-cv-ft).
 
 Like the PhoneticXeus export, the feature extractor's per-utterance normalisation
 is moved into the graph, so the browser feeds the raw waveform to every model.
@@ -29,11 +32,13 @@ class Logits(torch.nn.Module):
         return self.model(input_values=wav).logits
 
 
-def main(outdir):
+def main(outdir, checkpoint=CHECKPOINT):
     os.makedirs(outdir, exist_ok=True)
-    processor = AutoProcessor.from_pretrained(CHECKPOINT)
+    # do_phonemize=False: Wav2Vec2Phoneme's tokenizer would otherwise start an espeak
+    # backend, needed only for text -> phonemes, never for decoding
+    processor = AutoProcessor.from_pretrained(checkpoint, do_phonemize=False)
     assert processor.feature_extractor.do_normalize
-    model = AutoModelForCTC.from_pretrained(CHECKPOINT).eval()
+    model = AutoModelForCTC.from_pretrained(checkpoint).eval()
     fp32 = os.path.join(outdir, "model.onnx")
     torch.onnx.export(Logits(model), (torch.randn(1, 32000),), fp32,
                       input_names=["wav"], output_names=["logits"],
@@ -48,4 +53,4 @@ def main(outdir):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    main(*sys.argv[1:3])
