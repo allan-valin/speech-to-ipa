@@ -29,14 +29,14 @@ def inventory(indexer, which):
 class LogProbs(torch.nn.Module):
     def __init__(self, estimator, feature_matrix, layer):
         super().__init__()
-        self.estimator, self.layer = estimator, layer
+        self.net, self.layer = estimator.model, layer        # a submodule: weights export as initializers
         self.register_buffer("feature_matrix", feature_matrix)
 
     def forward(self, wav):                       # (1, samples)
         from allophant.dataset_processing import Batch
         lengths = torch.ones_like(wav[0]).sum().long().unsqueeze(0)    # traced from the shape, stays dynamic
-        out = self.estimator.model(Batch(wav, lengths, torch.zeros(1, dtype=torch.long)), self.feature_matrix, predict=True)
-        return self.estimator.model.log_probabilities(out.outputs[self.layer]).transpose(0, 1)
+        out = self.net(Batch(wav, lengths, torch.zeros(1, dtype=torch.long)), self.feature_matrix, predict=True)
+        return self.net.log_probabilities(out.outputs[self.layer]).transpose(0, 1)
 
 
 def main(outdir, which="universal"):
@@ -47,16 +47,22 @@ def main(outdir, which="universal"):
     estimator.model.eval()
     inv = inventory(indexer, which)
     layer = ProjectionEntryConfig.PHONEME_LAYER
-    sub = indexer.attributes.subset(inv)
-    phones = list(sub.feature_values(layer, torch.arange(len(inv))))
+    phones = list(inv)                    # output i + 1 is phone inv[i]: the matrix keeps the inventory order
     fm = indexer.composition_feature_matrix(inv)
     model = LogProbs(estimator, fm, layer).eval()
+    for p in estimator.model.parameters():   # the Estimator is not a Module: reach its network directly
+        p.requires_grad_(False)
+    for m in estimator.model.modules():                 # plain tensor attributes the tracer would bake in
+        for k, v in list(vars(m).items()):
+            if isinstance(v, torch.Tensor) and v.requires_grad:
+                setattr(m, k, v.detach())
     with torch.no_grad():
         probe = model(torch.randn(1, 32000))
     print("inventory", which, len(inv), "output", tuple(probe.shape))
     fp32 = os.path.join(outdir, "model.onnx")
-    torch.onnx.export(model, (torch.randn(1, 32000),), fp32, input_names=["wav"], output_names=["logits"],
-                      dynamic_axes={"wav": {1: "samples"}, "logits": {1: "frames"}}, opset_version=17, dynamo=False)
+    with torch.no_grad():
+        torch.onnx.export(model, (torch.randn(1, 32000),), fp32, input_names=["wav"], output_names=["logits"],
+                          dynamic_axes={"wav": {1: "samples"}, "logits": {1: "frames"}}, opset_version=17, dynamo=False)
     from onnxruntime.quantization import QuantType, quantize_dynamic
     # MatMul only, per channel: the setting that kept Wav2Vec2Phoneme within 0.3 PER of fp32
     quantize_dynamic(fp32, os.path.join(outdir, "model.int8.onnx"), weight_type=QuantType.QInt8,

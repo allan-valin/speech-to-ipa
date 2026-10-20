@@ -32,7 +32,7 @@ export default {
   "opt.seqMsg": "Läge: en i taget.", "opt.allMsg": "Läge: alla på en gång.",
   "opt.advanced": "Avancerat", "opt.backend": "Bearbetning",
   "opt.onMsg": "På: {what}.", "opt.offMsg": "Av: {what}.",
-  "model.soon": "inte konverterad än", "model.cached": "nedladdad", "model.toDownload": "{size} att ladda ner",
+  "model.soon": "inte tillgänglig", "model.cached": "nedladdad", "model.toDownload": "{size} att ladda ner",
   "model.delete": "radera", "model.deleted": "{name} raderad från webbläsaren ({size} frigjort).",
   "model.on": "{name} vald.", "model.off": "{name} avmarkerad.",
   "dl.title": "Ladda ner modellerna?",
@@ -138,11 +138,11 @@ export default {
   <li>De fem rekommenderade är artikelns bästa på referensmängden (VoxAngeles, 95 språk) som får plats i en webbläsare, och de skiljer sig från varandra:
     olika arkitekturer och träningsdata gör fel på olika ställen, så när de är överens betyder det något.
     På 760 inspelningar får konsensus 47,1 % av fonerna fel mot 49,4 % för den bästa enskilda modellen; symboler med majoritet är rätt 69 % av gångerna, markerade bara 27 %.</li>
-  <li><b>Wav2Vec2Phoneme</b> är näst bäst på egen hand (PER 53,0), men den lärde sig från ordboksuttal (eSpeak): den drar åt ”läroboksuttalet”, vilket den här appen vill undvika. Den skulle ersätta WhIPA om du accepterar det. Inte konverterad än.</li>
-  <li><b>LoWhIPA comb</b> är bättre än WhIPA base (77,8 mot 83,7) i samma storlek: en kandidat att ersätta WhIPA. Inte konverterad än.</li>
+  <li><b>Wav2Vec2Phoneme</b> är näst bäst på egen hand (PER 53,0) och i stället för WhIPA blir konsensus lite bättre (46,0 mot 47,1 i PER på 760 inspelningar) och markeringen mer pålitlig (markerade symboler stämmer bara i 22 % av fallen). Men den har lärt sig av ordboksuttal (eSpeak): den drar åt "läroboks"-uttalet, som den här appen vill undvika. Du väljer.</li>
+  <li><b>LoWhIPA comb</b> är bättre än WhIPA base (75,8 mot 79,3 i PER i appen) med samma storlek; i stället för WhIPA blir konsensus lite bättre (46,7 mot 47,1) utan att något går förlorat.</li>
   <li><b>ZIPA large</b> finns, men på referensmängden gick den sämre än lilla ZIPA (69,1 mot 64,2) och den är 4 gånger större: bara som en extra röst.</li>
   <li><b>Allophant</b> (71,0) och <b>Allosaurus</b> (91,7, från 2020) är mest till för jämförelse. <b>WhIPA large</b> (69,4) har 1,5 miljarder parametrar: för stor för en webbläsare.</li>
-  <li>Har du plats? Välj allt. Majoriteten är alltid ”mer än hälften av modellerna som kördes”; med ett jämnt antal modeller markeras oavgjorda. Byten är ännu inte uppmätta i konsensus.</li>
+  <li>Har du utrymme? Välj allt. Majoriteten är alltid "mer än hälften av modellerna som kördes"; med ett jämnt antal modeller markeras oavgjort. Med de 9 mindre (alla utom ZIPA large) stämmer symboler med majoritet i 74 % av fallen (mot 69 %), men en tredjedel markeras.</li>
 </ul>
 <h3>Utrymme och cache</h3>
 <ul>

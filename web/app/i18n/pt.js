@@ -32,7 +32,7 @@ export default {
   "opt.seqMsg": "Modo: um de cada vez.", "opt.allMsg": "Modo: todos ao mesmo tempo.",
   "opt.advanced": "Avançado", "opt.backend": "Processamento",
   "opt.onMsg": "Ligado: {what}.", "opt.offMsg": "Desligado: {what}.",
-  "model.soon": "ainda não convertido", "model.cached": "baixado", "model.toDownload": "{size} a baixar",
+  "model.soon": "indisponível", "model.cached": "baixado", "model.toDownload": "{size} a baixar",
   "model.delete": "apagar", "model.deleted": "{name} apagado do navegador ({size} liberados).",
   "model.on": "{name} marcado.", "model.off": "{name} desmarcado.",
   "dl.title": "Baixar os modelos?",
@@ -138,11 +138,11 @@ export default {
   <li>Os cinco recomendados são os melhores do artigo no conjunto de referência (VoxAngeles, 95 línguas) que cabem num navegador, e são diferentes entre si:
     arquiteturas e dados de treino diferentes erram em lugares diferentes, então quando concordam isso vale alguma coisa.
     Em 760 gravações: o consenso erra 47,1% dos fones contra 49,4% do melhor modelo sozinho; símbolos com maioria acertam 69%, os destacados só 27%.</li>
-  <li><b>Wav2Vec2Phoneme</b> é o segundo melhor sozinho (PER 53,0), mas aprendeu com pronúncias de dicionário (eSpeak): tende à pronúncia "de livro", o que este app quer evitar. Seria o substituto do WhIPA se você aceitar isso. Ainda não convertido.</li>
-  <li><b>LoWhIPA comb</b> é melhor que o WhIPA base (77,8 contra 83,7) e do mesmo tamanho: candidato a substituir o WhIPA. Ainda não convertido.</li>
+  <li><b>Wav2Vec2Phoneme</b> é o segundo melhor sozinho (PER 53,0) e, no lugar do WhIPA, deixa o consenso um pouco melhor (46,0 contra 47,1 de PER em 760 gravações) e o destaque mais confiável (destacados acertam só 22%). Mas aprendeu com pronúncias de dicionário (eSpeak): tende à pronúncia "de livro", o que este app quer evitar. A escolha é sua.</li>
+  <li><b>LoWhIPA comb</b> é melhor que o WhIPA base (75,8 contra 79,3 de PER no app) e do mesmo tamanho; no lugar do WhIPA, o consenso melhora um pouco (46,7 contra 47,1) sem perder nada.</li>
   <li><b>ZIPA large</b> está disponível, mas no conjunto de referência foi pior que o ZIPA pequeno (69,1 contra 64,2) e é 4 vezes maior: só como voto extra.</li>
   <li><b>Allophant</b> (71,0) e <b>Allosaurus</b> (91,7, de 2020) servem mais para comparação. O <b>WhIPA large</b> (69,4) tem 1,5 bilhão de parâmetros: grande demais para um navegador.</li>
-  <li>Tem espaço? Pode marcar tudo. A maioria é sempre "mais da metade dos modelos que rodaram"; com número par de modelos, empates ficam destacados. Trocas ainda não medidas no consenso.</li>
+  <li>Tem espaço? Pode marcar tudo. A maioria é sempre "mais da metade dos modelos que rodaram"; com número par de modelos, empates ficam destacados. Com os 9 menores (todos menos o ZIPA large), símbolos com maioria acertam 74% (contra 69%), mas um terço fica destacado.</li>
 </ul>
 <h3>Espaço e cache</h3>
 <ul>

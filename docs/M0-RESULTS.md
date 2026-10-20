@@ -162,3 +162,40 @@ Work dir `m0work/` (gitignored): phonetic-eval scripts, VoxAngeles, one env per
 model stack (hf, allophant, powsm), subset built from `build_full.py` output.
 Scripts in `eval/`: `vote.py` (+ tests), `run_vote.py`, `export_pxeus_onnx.py`,
 `run_onnx_ctc.py`.
+
+## The paper's other models in the browser (2026-10-20)
+
+All on the 760 subset, narrow, as the app decodes (greedy CTC / greedy Whisper).
+
+| Model | Copy | Size | PER / PFER | Original | Browser = Python |
+|---|---|---|---|---|---|
+| Wav2Vec2Phoneme | int8 MatMul-only, per channel | 357 MB | 50.6 / 14.6 | 49.8 / 14.1 | closer to fp32 than Python int8 (85/95 = fp32) |
+| LoWhIPA comb | LoRA merged, fp16 | 146 MB | 75.8 / 21.0 | (beam+fallback run stalled) | 95/95 |
+| Allophant | 16-language inventory, int8 MatMul | 357 MB | 73.0 / 23.2 (phones apart) | 71.5 / 22.2 | 73/95 = fp32 |
+| Allosaurus | fp32, front end in the graph | 45 MB | 94.6 / 34.8 | 94.1 / 34.4 | 95/95 |
+| ZIPA large | authors' int8 | 310 MB | 64.4 / 21.8 | — | — |
+
+- Full int8 cost Wav2Vec2Phoneme 2 PER points; per-channel int8 on MatMul only
+  (convolutions fp32) costs 0.3. Same setting used for Allophant.
+- Allophant with its whole database inventory (438 phones) scored 91 PER: rare
+  diacritics everywhere. The paper's fixed 16-language union (136 phones) is used.
+- Allosaurus: MFCC, CMVN, frame stacking and 16 → 8 kHz (resampy's own filter,
+  measured from its impulse response) are in the graph; features equal the
+  original's, decoded phones identical on 739/760 (it merges repeats across blanks).
+
+### Swaps in the vote
+
+| Vote | PER / PFER | agreed right | flagged right | agreed |
+|---|---|---|---|---|
+| the five (app) | 47.1 / 14.4 | 69.1% | 27.1% | 79.6% |
+| LoWhIPA for WhIPA | 46.7 / 14.0 | 69.1% | 27.7% | 80.0% |
+| Wav2Vec2Phoneme for WhIPA | 46.0 / 13.6 | 68.7% | 21.6% | 84.2% |
+| Wav2Vec2Phoneme for MultIPA | 46.1 / 13.7 | | | 82.1% |
+| five + Wav2Vec2Phoneme + LoWhIPA (7) | 46.0 / 13.9 | 71.6% | 29.2% | 76.2% |
+| 9 (all but ZIPA large) | 46.6 / 13.9 | 73.8% | 34.7% | 67.4% |
+| 10 | 46.9 / 14.1 | | | 61.6% |
+
+All within ~1 PER point. LoWhIPA is a free swap for WhIPA (same size, never worse).
+Wav2Vec2Phoneme gives the lowest PER and the sharpest highlight (flagged phones
+right only 22%), but it was trained on eSpeak (dictionary) phonemes. More models
+raise the accuracy of agreed phones (74% with 9) at the cost of flagging a third.

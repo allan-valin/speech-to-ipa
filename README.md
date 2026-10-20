@@ -24,9 +24,18 @@ than pt/en are machine-made and welcome corrections).
 | [MultIPA](https://huggingface.co/ctaguchi/wav2vec2-large-xlsr-japlmthufielta-ipa1000-ns) | CTC, int8 ([copy](https://huggingface.co/allan-valin/multipa-onnx)) | 318 MB | MIT |
 | [WhIPA base](https://huggingface.co/jshrdt/whipa-base-cv) | Whisper, greedy, fp16 ([copy](https://huggingface.co/allan-valin/whipa-base-onnx)) | 146 MB | Apache 2.0 |
 
-Also selectable: ZIPA large (authors' int8, 310 MB). Listed but not converted yet:
-Wav2Vec2Phoneme, LoWhIPA comb, Allophant, Allosaurus — see ☰ → Help in the app for
-why the five and which to swap for which.
+The paper's other models are selectable too, converted the same way:
+
+| Model | Runs as | Size | Licence |
+|---|---|---|---|
+| [Wav2Vec2Phoneme](https://huggingface.co/facebook/wav2vec2-xlsr-53-espeak-cv-ft) | CTC, int8 ([copy](https://huggingface.co/allan-valin/wav2vec2phoneme-onnx)) | 357 MB | Apache 2.0 |
+| [LoWhIPA comb](https://huggingface.co/jshrdt/lowhipa-base-comb) | Whisper + merged LoRA, fp16 ([copy](https://huggingface.co/allan-valin/lowhipa-base-comb-onnx)) | 146 MB | Apache 2.0 |
+| [Allophant](https://huggingface.co/kgnlp/allophant) | CTC, 16-language inventory, int8 ([copy](https://huggingface.co/allan-valin/allophant-onnx)) | 357 MB | Apache 2.0 |
+| [ZIPA large](https://huggingface.co/anyspeech/zipa-large-crctc-ns-800k) | CTC, the authors' int8 | 310 MB | CC BY-NC-SA 4.0 |
+| [Allosaurus](https://github.com/xinjli/allosaurus) | BiLSTM, front end in the graph ([copy](https://huggingface.co/allan-valin/allosaurus-onnx)) | 45 MB | GPL 3.0 |
+
+Swapping LoWhIPA in for WhIPA, or Wav2Vec2Phoneme (trained on eSpeak phonemes), moves
+the vote by under 1.1 PER points; details in [docs/M0-RESULTS.md](docs/M0-RESULTS.md).
 
 Models were chosen on a gold benchmark (VoxAngeles, 95 languages) from
 [phonetic-eval](https://github.com/allan-valin/phonetic-eval). On 760 gold

@@ -80,7 +80,11 @@ export const MODELS = [
     paper: { cite: "Suchardt, El-Shazli, Cassotti. Towards Language-Agnostic STIPA. EMNLP 2025", url: "https://aclanthology.org/2025.emnlp-main.1600/" },
   },
   {
-    id: "allophant", name: "Allophant", ready: false, mb: 320, gold: { per: 71.0, pfer: 20.5 },
+    // fixed 16-language inventory baked in (the paper's run); the full database inventory scored far worse
+    id: "allophant", name: "Allophant", ready: true, mb: 357, input: "wave", gold: { per: 71.0, pfer: 20.5 },
+    url: `${HF}/allan-valin/allophant-onnx/resolve/main/model.int8.onnx`,
+    vocab: { url: `${HF}/allan-valin/allophant-onnx/resolve/main/vocab.json`, format: "json" },
+    copy: `${HF}/allan-valin/allophant-onnx`,
     credit: "Glocker et al. 2023", license: "Apache 2.0", licenseUrl: "https://www.apache.org/licenses/LICENSE-2.0",
     source: `${HF}/kgnlp/allophant`,
     paper: { cite: "Glocker, Herygers, Georges. Allophant: Cross-lingual Phoneme Recognition with Articulatory Attributes. Interspeech 2023", url: "https://arxiv.org/abs/2306.04306" },
@@ -94,8 +98,12 @@ export const MODELS = [
     paper: { cite: "Zhu, Samir, Chodroff, Mortensen. ZIPA. ACL 2025", url: "https://aclanthology.org/2025.acl-long.961/" },
   },
   {
-    id: "allosaurus", name: "Allosaurus", ready: false, mb: 15, gold: { per: 91.7, pfer: 32.7 },
-    credit: "Li et al. 2020", license: "GPL 3.0", licenseUrl: "https://github.com/xinjli/allosaurus/blob/master/LICENSE",
+    // its 8 kHz MFCC front end is inside the graph, so it takes the raw waveform too
+    id: "allosaurus", name: "Allosaurus", ready: true, mb: 45, input: "wave", gold: { per: 91.7, pfer: 32.7 },
+    url: `${HF}/allan-valin/allosaurus-onnx/resolve/main/model.onnx`,
+    vocab: { url: `${HF}/allan-valin/allosaurus-onnx/resolve/main/vocab.json`, format: "json" },
+    copy: `${HF}/allan-valin/allosaurus-onnx`,
+    credit: "Li et al. 2020", license: "GPL 3.0", licenseUrl: "https://www.gnu.org/licenses/gpl-3.0.html",
     source: "https://github.com/xinjli/allosaurus",
     paper: { cite: "Li, Dalmia, Li, Lee, Littell, Yao, Anastasopoulos, Mortensen, Neubig, Black, Metze. Universal Phone Recognition with a Multilingual Allophone System. ICASSP 2020", url: "https://arxiv.org/abs/2002.11800" },
   },

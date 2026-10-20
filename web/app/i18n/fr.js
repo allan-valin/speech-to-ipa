@@ -31,7 +31,7 @@ export default {
   "opt.seqMsg": "Mode : un par un.", "opt.allMsg": "Mode : tous en même temps.",
   "opt.advanced": "Avancé", "opt.backend": "Traitement",
   "opt.onMsg": "Activé : {what}.", "opt.offMsg": "Désactivé : {what}.",
-  "model.soon": "pas encore converti", "model.cached": "téléchargé", "model.toDownload": "{size} à télécharger",
+  "model.soon": "indisponible", "model.cached": "téléchargé", "model.toDownload": "{size} à télécharger",
   "model.delete": "supprimer", "model.deleted": "{name} supprimé du navigateur ({size} libérés).",
   "model.on": "{name} coché.", "model.off": "{name} décoché.",
   "dl.title": "Télécharger les modèles ?",
@@ -137,11 +137,11 @@ export default {
   <li>Les cinq recommandés sont les meilleurs de l’article sur le jeu de référence (VoxAngeles, 95 langues) qui tiennent dans un navigateur, et ils diffèrent les uns des autres :
     des architectures et des données d’entraînement différentes se trompent à des endroits différents, donc quand ils concordent, cela vaut quelque chose.
     Sur 760 enregistrements : le consensus se trompe sur 47,1 % des phones contre 49,4 % pour le meilleur modèle seul ; les symboles majoritaires sont justes à 69 %, ceux en surbrillance à 27 % seulement.</li>
-  <li><b>Wav2Vec2Phoneme</b> est le deuxième meilleur seul (PER 53,0), mais il a appris sur des prononciations de dictionnaire (eSpeak) : il tend vers la prononciation « de manuel », ce que cette application veut éviter. Il remplacerait WhIPA si vous l’acceptez. Pas encore converti.</li>
-  <li><b>LoWhIPA comb</b> est meilleur que WhIPA de base (77,8 contre 83,7) et de même taille : candidat pour remplacer WhIPA. Pas encore converti.</li>
+  <li><b>Wav2Vec2Phoneme</b> est le deuxième meilleur seul (PER 53,0) et, à la place de WhIPA, il améliore un peu le consensus (46,0 contre 47,1 de PER sur 760 enregistrements) et rend la mise en évidence plus fiable (les symboles surlignés ne sont justes qu'à 22 %). Mais il a appris sur des prononciations de dictionnaire (eSpeak) : il tend vers la prononciation « de manuel », ce que cette appli veut éviter. À vous de choisir.</li>
+  <li><b>LoWhIPA comb</b> est meilleur que WhIPA base (75,8 contre 79,3 de PER dans l'appli) pour la même taille ; à la place de WhIPA, le consensus s'améliore un peu (46,7 contre 47,1) sans rien perdre.</li>
   <li><b>ZIPA large</b> est disponible, mais sur le jeu de référence il a fait moins bien que le petit ZIPA (69,1 contre 64,2) et il est 4 fois plus gros : seulement comme voix supplémentaire.</li>
   <li><b>Allophant</b> (71,0) et <b>Allosaurus</b> (91,7, de 2020) servent plutôt à la comparaison. <b>WhIPA large</b> (69,4) a 1,5 milliard de paramètres : trop gros pour un navigateur.</li>
-  <li>Vous avez de la place ? Vous pouvez tout cocher. La majorité est toujours « plus de la moitié des modèles qui ont tourné » ; avec un nombre pair de modèles, les égalités sont mises en surbrillance. Les remplacements ne sont pas encore mesurés dans le consensus.</li>
+  <li>Vous avez la place ? Cochez tout. La majorité est toujours « plus de la moitié des modèles qui ont tourné » ; avec un nombre pair de modèles, les égalités sont surlignées. Avec les 9 plus petits (tous sauf ZIPA large), les symboles majoritaires sont justes à 74 % (contre 69 %), mais un tiers est surligné.</li>
 </ul>
 <h3>Espace et cache</h3>
 <ul>

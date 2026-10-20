@@ -32,7 +32,7 @@ export default {
   "opt.seqMsg": "Mode: one at a time.", "opt.allMsg": "Mode: all at once.",
   "opt.advanced": "Advanced", "opt.backend": "Processing",
   "opt.onMsg": "On: {what}.", "opt.offMsg": "Off: {what}.",
-  "model.soon": "not converted yet", "model.cached": "downloaded", "model.toDownload": "{size} to download",
+  "model.soon": "unavailable", "model.cached": "downloaded", "model.toDownload": "{size} to download",
   "model.delete": "delete", "model.deleted": "{name} deleted from the browser ({size} freed).",
   "model.on": "{name} selected.", "model.off": "{name} deselected.",
   "dl.title": "Download the models?",
@@ -138,11 +138,11 @@ export default {
   <li>The five recommended are the paper's best on the reference set (VoxAngeles, 95 languages) that fit in a browser, and they differ from each other:
     different architectures and training data make mistakes in different places, so when they agree it means something.
     On 760 recordings the consensus gets 47.1% of phones wrong against 49.4% for the best single model; symbols with a majority are right 69% of the time, highlighted ones only 27%.</li>
-  <li><b>Wav2Vec2Phoneme</b> is the second best on its own (PER 53.0), but it learned from dictionary pronunciations (eSpeak): it leans towards the "textbook" pronunciation, which this app wants to avoid. It would replace WhIPA if you accept that. Not converted yet.</li>
-  <li><b>LoWhIPA comb</b> is better than WhIPA base (77.8 vs 83.7) at the same size: a candidate to replace WhIPA. Not converted yet.</li>
+  <li><b>Wav2Vec2Phoneme</b> is the second best on its own (PER 53.0), and in place of WhIPA it makes the consensus slightly better (46.0 vs 47.1 PER on 760 recordings) and the highlight more reliable (highlighted symbols right only 22% of the time). But it learned from dictionary pronunciations (eSpeak): it leans towards the "textbook" pronunciation, which this app wants to avoid. Your call.</li>
+  <li><b>LoWhIPA comb</b> is better than WhIPA base (75.8 vs 79.3 PER in the app) at the same size; in place of WhIPA the consensus improves slightly (46.7 vs 47.1) with nothing lost.</li>
   <li><b>ZIPA large</b> is available, but on the reference set it did worse than small ZIPA (69.1 vs 64.2) and is 4 times bigger: only as an extra vote.</li>
   <li><b>Allophant</b> (71.0) and <b>Allosaurus</b> (91.7, from 2020) are mostly for comparison. <b>WhIPA large</b> (69.4) has 1.5 billion parameters: too big for a browser.</li>
-  <li>Have the space? Select everything. The majority is always "more than half of the models that ran"; with an even number of models, ties are highlighted. Swaps not yet measured in the consensus.</li>
+  <li>Have the space? Select everything. The majority is always "more than half of the models that ran"; with an even number of models, ties are highlighted. With the 9 smaller ones (all but ZIPA large), symbols with a majority are right 74% of the time (vs 69%), but a third get highlighted.</li>
 </ul>
 <h3>Space and cache</h3>
 <ul>

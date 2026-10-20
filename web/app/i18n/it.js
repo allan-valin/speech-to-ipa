@@ -32,7 +32,7 @@ export default {
   "opt.seqMsg": "Modalità: uno alla volta.", "opt.allMsg": "Modalità: tutti insieme.",
   "opt.advanced": "Avanzate", "opt.backend": "Elaborazione",
   "opt.onMsg": "Attivato: {what}.", "opt.offMsg": "Disattivato: {what}.",
-  "model.soon": "non ancora convertito", "model.cached": "scaricato", "model.toDownload": "{size} da scaricare",
+  "model.soon": "non disponibile", "model.cached": "scaricato", "model.toDownload": "{size} da scaricare",
   "model.delete": "elimina", "model.deleted": "{name} eliminato dal browser ({size} liberati).",
   "model.on": "{name} selezionato.", "model.off": "{name} deselezionato.",
   "dl.title": "Scaricare i modelli?",
@@ -138,11 +138,11 @@ export default {
   <li>I cinque consigliati sono i migliori dell'articolo sull'insieme di riferimento (VoxAngeles, 95 lingue) che entrano in un browser, e sono diversi tra loro:
     architetture e dati di addestramento diversi sbagliano in punti diversi, quindi quando concordano significa qualcosa.
     Su 760 registrazioni il consenso sbaglia il 47,1% dei foni contro il 49,4% del miglior modello singolo; i simboli con maggioranza sono giusti il 69% delle volte, quelli evidenziati solo il 27%.</li>
-  <li><b>Wav2Vec2Phoneme</b> è il secondo migliore da solo (PER 53,0), ma ha imparato da pronunce di dizionario (eSpeak): tende alla pronuncia «da manuale», che questa app vuole evitare. Sostituirebbe WhIPA se lo accetti. Non ancora convertito.</li>
-  <li><b>LoWhIPA comb</b> è migliore di WhIPA base (77,8 contro 83,7) con la stessa dimensione: candidato a sostituire WhIPA. Non ancora convertito.</li>
+  <li><b>Wav2Vec2Phoneme</b> è il secondo migliore da solo (PER 53,0) e, al posto di WhIPA, migliora un po' il consenso (46,0 contro 47,1 di PER su 760 registrazioni) e rende l'evidenziazione più affidabile (i simboli evidenziati sono giusti solo nel 22% dei casi). Ma ha imparato da pronunce da dizionario (eSpeak): tende alla pronuncia "da manuale", che questa app vuole evitare. Scegli tu.</li>
+  <li><b>LoWhIPA comb</b> è migliore di WhIPA base (75,8 contro 79,3 di PER nell'app) a parità di dimensioni; al posto di WhIPA il consenso migliora un po' (46,7 contro 47,1) senza perdere nulla.</li>
   <li><b>ZIPA large</b> è disponibile, ma sull'insieme di riferimento è andato peggio di ZIPA piccolo (69,1 contro 64,2) ed è 4 volte più grande: solo come voto in più.</li>
   <li><b>Allophant</b> (71,0) e <b>Allosaurus</b> (91,7, del 2020) servono soprattutto per confronto. <b>WhIPA large</b> (69,4) ha 1,5 miliardi di parametri: troppo grande per un browser.</li>
-  <li>Hai spazio? Seleziona tutto. La maggioranza è sempre «più della metà dei modelli eseguiti»; con un numero pari di modelli, i pareggi vengono evidenziati. Sostituzioni non ancora misurate nel consenso.</li>
+  <li>Hai spazio? Seleziona tutto. La maggioranza è sempre "più della metà dei modelli eseguiti"; con un numero pari di modelli, i pareggi vengono evidenziati. Con i 9 più piccoli (tutti tranne ZIPA large), i simboli con maggioranza sono giusti nel 74% dei casi (contro il 69%), ma un terzo viene evidenziato.</li>
 </ul>
 <h3>Spazio e cache</h3>
 <ul>

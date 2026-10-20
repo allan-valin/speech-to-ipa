@@ -38,7 +38,7 @@ def main(model_path, vocab_path, name):
             if i != prev and not (sym.startswith("<") and sym.endswith(">")):
                 phones.append(sym)
             prev = i
-        save(outdir, audio, "".join(phones))
+        save(outdir, audio, os.environ.get("SEP", "").join(phones))   # SEP=" " keeps phone boundaries for scoring
 
 
 if __name__ == "__main__":
